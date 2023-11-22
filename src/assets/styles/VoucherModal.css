@@ -1,0 +1,60 @@
+/* Trong file CSS của bạn */
+
+/* Định dạng modal */
+
+.modal-voucher {
+    max-height: 70vh; /* Đặt chiều cao tối đa là 66% chiều cao của viewport */
+    overflow-y: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* height: 100%; */
+    transform: translate(-50%, -50%);
+    max-width: 80vw; /* Đặt chiều rộng tối đa nếu muốn */
+    width: auto;
+    background-color: white;
+    border: black;
+    z-index: 11;
+  }
+  
+  /* Định dạng overlay */
+  .overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Thêm hiệu ứng khi hover */
+  .hover-bg-gray-100:hover {
+    background-color: #f3f4f6;
+  }
+  .modal-overlay {
+    
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10;
+  }
+  
+  .modal-overlay.active {
+    display: block;
+  }
+  .voucher-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .voucher-item {
+    width: 50%; /* Hiển thị thành 2 cột */
+    box-sizing: border-box;
+    padding: 8px;
+  }
+  
+  /* Thêm styles cho khi responsive (điện thoại, máy tính bảng, ...) */
+  @media (max-width: 768px) {
+    .voucher-item {
+      width: 100%; /* Hiển thị toàn bộ chiều rộng */
+    }
+  }
