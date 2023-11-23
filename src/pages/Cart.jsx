@@ -164,6 +164,7 @@ const Cart = () => {
                 const data = await cartService.checkVoucher({ UserId: 1, Items: selectedItems, VoucherCode: InputVoucherCode });
                 // setSelectedVoucher( await voucherService.findVoucher(selectedVoucher.code));
                 setCheckVoucher(data);
+                setSelectedVoucher(findVoucher);                
 
                 // return;
             }
@@ -174,8 +175,8 @@ const Cart = () => {
     };
     const handleButtonClickQuantity = async (plan, value, quantity) => {
         try {
-            console.log(plan)
-            if (value + quantity <= (plan?.Subscription_plan.total - plan?.Subscription_plan.quantity_sold)) {
+            console.log(value + quantity <= (plan?.Subscription_plan.total - plan?.Subscription_plan.quantity_sold))
+            if (value + quantity <= (plan?.Subscription_plan.total - plan?.Subscription_plan.quantity_sold) || quantity < 0) {
                 await cartService.updateCart(plan.id, (value + quantity));
                 const indexToDelete = cartItems.findIndex(obj => obj.id === plan.id && (quantity + value) <= 0);
                 setCartItems(cartItems.map(item => (item.id === plan.id ? { ...item, quantity: value + quantity } : item)));
@@ -216,7 +217,10 @@ const Cart = () => {
     const navigate = useNavigate();
 
     const navigateToCheckout = () => {
+
         const selectedItems = cartItems.filter(item => item.selected);
+        if (selectedItems.length < 1)
+           return showMessage('Vui lòng chọn sản phẩm');
         console.log(selectedVoucher)
         navigate('/checkout', { state: { selectedItems: selectedItems, voucher: selectedVoucher } });
     };
