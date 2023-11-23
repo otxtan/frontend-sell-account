@@ -1,30 +1,100 @@
-import React, { useState } from 'react';
-import VoucherModal from '../components/common/VoucherModal';
-
+import React, { useEffect, useState } from 'react';
+import Modal from 'react-modal';
+import cartService from '../services/cartService';
+import voucherService from '../services/voucherService';
+import { ToastContainer, toast } from 'react-toastify';
+import { useLocation } from 'react-router-dom';
+import { data } from 'jquery';
+Modal.setAppElement('#root');
 const Checkout = () => {
-    const [cartItems, setCartItems] = useState([
-        { id: 1, name: 'Product A', price: 20.0, quantity: 2, category: 'Electronics', image: 'https://gamikey.com/wp-content/uploads/2023/09/Adobe-Pro-Edition-Banner-1536x768.png', selected: false },
-        { id: 2, name: 'Product B', price: 30.5, quantity: 1, category: 'Clothing', image: 'path/to/productB.jpg', selected: false },
-    ]);
-    const [isModalOpen, setModalOpen] = useState(false);
-    const [selectedVoucher, setSelectedVoucher] = useState(null);
+    const location = useLocation();
 
+    const [cartItems, setCartItems] = useState([]);
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [selectedVoucher, setSelectedVoucher] = useState(location.state.voucher);
+    const [voucher, setVoucher] = useState();
+    const [checkVoucher, setCheckVoucher] = useState([]);
+    const [isMobile, setIsMobile] = useState(false);
+    const VND = new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+    });
+    const [discount, setDiscount] = useState(0);
     const openModal = () => setModalOpen(true);
     const closeModal = () => setModalOpen(false);
-
     const handleSelectVoucher = (voucher) => {
         setSelectedVoucher(voucher);
         closeModal();
     };
-
+    const showMessage = (message) => {
+        toast.success(message, {
+            position: 'top-right',
+            autoClose: 3000, // Đóng tự động sau 3000 milliseconds (3 giây)
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+        });
+    }
     const [voucherCode, setVoucherCode] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('');
+    const [InputVoucherCode, setInputVoucherCode] = useState();
+    const handleInputVoucherCode = async (event) => {
+        setInputVoucherCode(event.target.value ? event.target.value : null);
 
-    const handleApplyVoucher = () => {
-        // Xử lý logic áp dụng voucher, có thể gọi API để kiểm tra voucher code
-        console.log('Applying voucher:', voucherCode);
-    };
+    }
 
+    useEffect(() => {
+        function handleResize() {
+            setIsMobile(window.innerWidth <= 767);
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Kiểm tra kích thước ban đầu
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             // const data = await cartService.getCartByUser(1);
+    //             // setCartItems(data);
+
+    //         } catch (error) {
+    //             console.error('Error fetching products:', error);
+    //         }
+    //     };
+
+    //     fetchData();
+    // }, []);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+
+                console.log(location)
+                
+                setCartItems(location.state.selectedItems)
+                // setSelectedVoucher();
+
+                const selectedItems = cartItems.filter(item => item.selected);
+                
+                if (selectedItems.length >= 1 && selectedVoucher?.code) {
+                    const data = await cartService.checkVoucher({ UserId: 1, Items: selectedItems, VoucherCode: selectedVoucher?.code });
+                    setCheckVoucher(data);
+                }
+                
+                const datavoucher = await voucherService.getvoucherbyproductcategory({ product: location.state.selectedItems });
+                console.log(selectedVoucher)
+                setVoucher(datavoucher);
+            } catch (error) {
+                console.error('Error fetching products:', error.message);
+            }
+        };
+
+        fetchData();
+    }, [selectedVoucher, cartItems]);
     const handlePaymentMethodChange = (method) => {
         // Xử lý thay đổi phương thức thanh toán
         setPaymentMethod(method);
@@ -34,163 +104,148 @@ const Checkout = () => {
         // Xử lý logic thanh toán, có thể gọi API để xác nhận đơn hàng
         console.log('Checking out with payment method:', paymentMethod);
     };
-    const vouchers = [
-        {
-            id: 1,
-            value: 30,
-            minOrderAmount: 99,
-            expirationDate: '30.11.2023',
-        },
-        {
-            id: 2,
-            value: 50,
-            minOrderAmount: 150,
-            expirationDate: '15.12.2023',
-        },
-        {
-            id: 3,
-            value: 50,
-            minOrderAmount: 150,
-            expirationDate: '15.12.2023',
-        },
-        {
-            id: 4,
-            value: 50,
-            minOrderAmount: 150,
-            expirationDate: '15.12.2023',
-        },
-        {
-            id: 5,
-            value: 50,
-            minOrderAmount: 150,
-            expirationDate: '15.12.2023',
-        },
-        {
-            id: 6,
-            value: 50,
-            minOrderAmount: 150,
-            expirationDate: '15.12.2023',
-        },
-        {
-            id: 6,
-            value: 50,
-            minOrderAmount: 150,
-            expirationDate: '15.12.2023',
-        },
-        {
-            id: 8,
-            value: 30,
-            minOrderAmount: 99,
-            expirationDate: '30.11.2023',
-        },
-        {
-            id: 9,
-            value: 50,
-            minOrderAmount: 150,
-            expirationDate: '15.12.2023',
-        },
-        {
-            id: 10,
-            value: 50,
-            minOrderAmount: 150,
-            expirationDate: '15.12.2023',
-        },
-        {
-            id: 11,
-            value: 50,
-            minOrderAmount: 150,
-            expirationDate: '15.12.2023',
-        },
-        {
-            id: 12,
-            value: 50,
-            minOrderAmount: 150,
-            expirationDate: '15.12.2023',
-        },
-        {
-            id: 13,
-            value: 50,
-            minOrderAmount: 150,
-            expirationDate: '15.12.2023',
-        },
-        {
-            id: 14,
-            value: 50,
-            minOrderAmount: 150,
-            expirationDate: '15.12.2023',
-        },
-        // Thêm các voucher khác
-    ];
 
+    const applyVoucher = async () => {
+        // setDiscount(10); // 10% discount for demonstration purposes
+        try {
+            const selectedItems = cartItems.filter(item => item.selected);
+            const findVoucher = await voucherService.findVoucher(InputVoucherCode);
+            if (!findVoucher)
+                return showMessage("Voucher không tồn tại");
+            if (selectedItems.length >= 1) {
+                const data = await cartService.checkVoucher({ UserId: 1, Items: selectedItems, VoucherCode: InputVoucherCode });
+                // setSelectedVoucher( await voucherService.findVoucher(selectedVoucher.code));
+                setCheckVoucher(data);
+
+                // return;
+            }
+        } catch (error) {
+            console.log(error.message)
+        }
+
+    };
+    const handleButtonCancel = () => {
+        setSelectedVoucher(null);
+        checkVoucher.totalPayment = null;
+        checkVoucher.totalDiscount = null
+    }
+    const getTotalPrice = () => {
+        const selectedItems = cartItems.filter(item => item.selected);
+        const subtotal = selectedItems.reduce((total, item) => total + (item?.Subscription_plan?.price - (item?.Subscription_plan?.price * item?.Subscription_plan?.discount_percentage / 100)) * item.quantity, 0);
+        return subtotal - (subtotal * (discount / 100));
+    };
 
     return (
-        <div className="max-w-screen-lg mx-auto mt-10 p-6 bg-orange-100 rounded-md shadow-md">
+        <div className="max-w-screen-lg mx-auto mt-10 p-6 bg-whitey-100 rounded-md shadow-md">
+            <ToastContainer />
             <h2 className="text-2xl font-semibold mb-6">Checkout</h2>
-            <ul>
-                {cartItems.map(item => (
-                    <li key={item.id} className="flex items-center justify-between border-b border-gray-300 py-2">
-                        <div className="flex items-center">
+            <div>
+                {cartItems?.map(item => (
+                    <section key={item.id} className={isMobile ? " flex flex-wrap items-center border-b border-gray-200 py-4 " : "flex items-center border-b border-gray-200 py-4 "}>
+                        <div className="flex w-4/6 ">
+                            <div className="w-1/3 ">
+                                <img
+                                    src={item?.Subscription_plan?.Product?.image}
+                                    alt={item?.Subscription_plan?.Product?.image || '#'}
 
-                            <img
-                                src={item.image}
-                                alt={item.name}
-                                className="mx-20 h-16 w-auto ml-4 "
-                            />
-                            <div>
-                                <span className="font-semibold">{item.name}</span>
-                                <p className="text-gray-600">Price: ${item.price} x {item.quantity}</p>
-                                <p className="text-gray-600">Category: {item.category}</p>
+                                />
+                            </div>
+                            <div className="w-2/3">
+                                <span className="font-semibold text-base">{item?.Subscription_plan?.Product?.name}</span>
+                                <p className="text-gray-600">Price:  {VND.format(item?.Subscription_plan?.price - (item?.Subscription_plan?.price * item?.Subscription_plan?.discount_percentage / 100))} </p>
+                                <p className="text-gray-600"> {item?.Subscription_plan?.packed_name}</p>
+                                <p className="text-gray-600"> Còn lại: {item?.Subscription_plan?.total - item?.Subscription_plan?.quantity_sold}</p>
                             </div>
                         </div>
+                        <div className=" w-1/6" data-hs-input-number>
 
-                    </li>
-                ))}
-            </ul>
-            {/* Section: Voucher */}
+                            <div className="flex items-center p-1 border-2 border-gray-600 rounded-md w-fit ">
+                                <span className="px-4">{item.quantity}</span>
+                            </div>
+                        </div>
+                        <div className="w-1/6">
 
+                            <p className="text-gray-600 ">{VND.format((item?.Subscription_plan?.price - (item?.Subscription_plan?.price * item?.Subscription_plan?.discount_percentage / 100)) * item?.quantity)} </p>
+                        </div>
+                        
+                    </section>
+                )
 
-
-            {/* Section: Voucher */}
-            <div className="mb-6">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Voucher Code</label>
+                )}
+            </div>
+            <div className="mb-6 mt-4 flex justify-end">
+                {/* <label className="block text-gray-700 text-sm font-bold mb-2">Voucher Code</label> */}
                 <button
                     className="bg-orange-500 text-white p-2 rounded-md focus:outline-none"
                     onClick={openModal}
                 >
-                    {selectedVoucher ? `Giảm ₫${selectedVoucher.value}k` : 'Chọn Voucher'}
+                    chọn Voucher
                 </button>
-                <VoucherModal
+                <Modal
                     isOpen={isModalOpen}
-                    onClose={closeModal}
-                    vouchers={vouchers}
-                    onSelectVoucher={handleSelectVoucher}
+                    onRequestClose={closeModal}
+                    contentLabel="Example Modal"
+                    style={{
+                        content: {
+                            width: '50%', // Thiết lập chiều rộng
+                            height: '50%', // Thiết lập chiều cao
+                            margin: 'auto',
+                        },
+                    }}
+                >
+                    <div className='flex justify-between p-2'>
+                        <h2>Voucher</h2>
+                        <p>Chọn Voucher</p>
+                        <button className='bg-orange-400 p-2 rounded-md ' onClick={closeModal}>Close</button>
+                    </div>
+                    <div className="max-h-screen overflow-y-scroll p-4">
+                        <h2 className="text-xl font-semibold mb-4">Chọn Voucher</h2>
+                        <div className="voucher-container">
+                            {voucher?.map(item => (
+                                <div
+                                    key={item.code}
+                                    className="cursor-pointer mb-4 p-2 hover:bg-gray-100 rounded-md voucher-item"
+                                    onClick={() => handleSelectVoucher(item)}
+                                >
+                                    <h3 className="text-lg font-semibold">{item?.code}-{item?.discount_percentage == 0 ? (`Giảm ${item.discount_amount}đ`) : (`Giảm ${item.discount_percentage}%`)}</h3>
+                                    <p className="text-gray-600 mb-2">{`Đơn Tối Thiểu ₫${item.min_order_amount}k`}</p>
+                                    <p className="text-gray-600">{`HSD: ${new Date(item.end_date).toLocaleDateString()} - ${new Date(item.end_date).toLocaleTimeString()}`}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </Modal>
+            </div>
+
+            <div className="mt-4 flex justify-end">
+                {/* <label className="block text-gray-600">Voucher Code:</label> */}
+                <input
+                    type="text"
+                    placeholder="Enter voucher code"
+                    className="border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:border-orange-500"
+                    // value={voucherCode}
+                    onChange={handleInputVoucherCode}
                 />
+                <button onClick={applyVoucher} className="bg-orange-500 text-white px-4 py-2 rounded-md ml-2 hover:bg-orange-600">
+                    Apply Voucher
+                </button>
+
             </div>
+            {
+                selectedVoucher ? (<div
+                    key={selectedVoucher?.code}
+                    className="my-2 cursor-pointer bg-orange-100 mb-4 p-2 hover:bg-gray-100 rounded-md voucher-item shadow"
+                // onClick={() => handleSelectVoucher(selectedVoucher)}
+                >
+                    <h3 className="text-lg font-semibold">{selectedVoucher?.code} - {selectedVoucher?.discount_percentage == 0 ? (`Giảm ${selectedVoucher?.discount_amount}đ`) : (`Giảm ${selectedVoucher?.discount_percentage}%`)}</h3>
+                    <p className="text-gray-600 mb-2">{`Đơn Tối Thiểu ₫${selectedVoucher?.min_order_amount}k`}</p>
+                    <p className="text-gray-600">{`HSD: ${new Date(selectedVoucher?.end_date).toLocaleDateString()} - ${new Date(selectedVoucher?.end_date).toLocaleTimeString()}`}</p>
+                    {
+                        selectedVoucher ? <button className=' p-2 bg-orange-500 shadow rounded-md text-white my-3' onClick={() => handleButtonCancel()}>Remove</button> : null
+                    }
+                </div>) : null
 
-            {/* ... Các phần khác của trang Checkout */}
-
-            <div className="mb-6">
-                <label htmlFor="voucher" className="block text-gray-700 text-sm font-bold mb-2">
-                    Voucher Code
-                </label>
-                <div className="flex">
-                    <input
-                        type="text"
-                        id="voucher"
-                        className="flex-1 p-3 rounded-l-md border border-r-0 border-gray-300"
-                        placeholder="Enter your voucher code"
-                        value={voucherCode}
-                        onChange={(e) => setVoucherCode(e.target.value)}
-                    />
-                    <button
-                        className="bg-orange-500 text-white p-3 rounded-r-md hover:bg-orange-600 transition-all duration-300"
-                        onClick={handleApplyVoucher}
-                    >
-                        Apply
-                    </button>
-                </div>
-            </div>
-
+            }
             {/* Section: Payment Method */}
             <div className="mb-6">
                 <label className="block text-gray-700 text-sm font-bold mb-2">Payment Method</label>
@@ -222,18 +277,13 @@ const Checkout = () => {
             <label className="block text-gray-700 text-sm font-bold mb-2">Payment Method</label>
 
             {/* Section: Order Summary */}
-            {/* ... Thêm phần order summary và thông tin sản phẩm đang mua */}
+          
 
             {/* Button: Checkout */}
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-                total amount:
+            <p className="text-lg font-semibold mt-4">total: {VND.format(getTotalPrice().toFixed(2) || checkVoucher?.total?.toFixed(2))}</p>
+            <p className="text-lg font-semibold mt-4">totalDiscount: {VND.format(checkVoucher?.totalDiscount?.toFixed(2) || 0)}</p>
+            <p className="text-lg font-semibold mt-4">totalPayment: {VND.format(checkVoucher?.totalPayment?.toFixed(2) || getTotalPrice().toFixed(2))}</p>
 
-            </label>
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-                total discount:
-
-            </label>
-            <label className="block text-gray-700 text-sm font-bold mb-2">total payment:</label>
             <button
                 className="w-full bg-orange-500 text-white p-3 rounded-md hover:bg-orange-600 transition-all duration-300"
                 onClick={handleCheckout}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../assets/styles/Cart.css';
 import cartService from '../services/cartService';
 import voucherService from '../services/voucherService';
@@ -7,6 +7,7 @@ import Modal from 'react-modal';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 Modal.setAppElement('#root');
 
 const Cart = () => {
@@ -42,27 +43,16 @@ const Cart = () => {
     }, []);
 
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await cartService.getCartByUser(1);
-                setCartItems(data);
 
-                const datavoucher = await voucherService.getvoucherbyproductcategory({ product: data });
-                setVoucher(datavoucher);
-            } catch (error) {
-                console.error('Error fetching products:', error);
-            }
-        };
-
-        fetchData();
-    }, []);
 
 
     useEffect(() => {
         const fetchData = async () => {
             try {
+
                 const selectedItems = cartItems.filter(item => item.selected);
+                const datavoucher = await voucherService.getvoucherbyproductcategory({ product: selectedItems });
+                setVoucher(datavoucher);
                 if (selectedItems.length >= 1 && selectedVoucher?.code) {
                     const data = await cartService.checkVoucher({ UserId: 1, Items: selectedItems, VoucherCode: selectedVoucher?.code });
                     setCheckVoucher(data);
@@ -74,6 +64,21 @@ const Cart = () => {
 
         fetchData();
     }, [selectedVoucher, cartItems]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await cartService.getCartByUser(1);
+                setCartItems(data);
+                // const selectedItems = cartItems.filter(item => item.selected);
+                // const datavoucher = await voucherService.getvoucherbyproductcategory({ product: selectedItems });
+                // setVoucher(datavoucher);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
     const showMessage = (message) => {
         toast.success(message, {
             position: 'top-right',
@@ -137,7 +142,17 @@ const Cart = () => {
         setSelectedVoucher(null);
 
     };
-
+    const [selectedAll, setSelectedAll] = useState(false);
+    const toggleSelectAll = () => {
+        if (!selectedAll) {
+            setCartItems(cartItems.map(item => (!item?.selected ? { ...item, selected: !item.selected } : item)));
+            setSelectedAll(true);
+        }
+        else {
+            setCartItems(cartItems.map(item => (item?.selected ? { ...item, selected: !item.selected } : item)));
+            setSelectedAll(false);
+        }
+    }
     const applyVoucher = async () => {
         // setDiscount(10); // 10% discount for demonstration purposes
         try {
@@ -170,6 +185,7 @@ const Cart = () => {
                 }
                 console.log(cartItems)
                 const selectedItems = cartItems.filter(item => item.selected);
+                console.log(selectedItems)
 
                 if (selectedItems.length >= 1 && selectedVoucher?.code) {
                     // setSelectedVoucher(voucher);
@@ -197,71 +213,106 @@ const Cart = () => {
         checkVoucher.totalPayment = null;
         checkVoucher.totalDiscount = null
     }
+    const navigate = useNavigate();
+
+    const navigateToCheckout = () => {
+        const selectedItems = cartItems.filter(item => item.selected);
+        console.log(selectedVoucher)
+        navigate('/checkout', { state: { selectedItems: selectedItems, voucher: selectedVoucher } });
+    };
 
     return (
         <div className='max-w-screen-lg mx-auto mt-10 p-6 shadow rounded-md shadow-md'>
-            <ToastContainer />
+            <p className="text-gray-600 mt-2">Số lượng sản phẩm: {cartItems.length}</p>
+            <ToastContainer />{isMobile ? null : <div className="flex">
+
+                <div className="w-1/6">{cartItems ? <input onClick={() => toggleSelectAll()} className='mx-4 h-5 w-5  text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600'
+                    type="checkbox"
+                    // checked={false}
+                    // defaultValue={false}
+                    onChange={() => { }}
+
+                />
+
+                    : null}</div>
+                <div className="w-3/6">Sản phẩm</div>
+                <div className="w-1/6">Số lượng</div>
+                <div className="w-1/6">Số tiền</div>
+                <div className="w-1/6">Thao Tác</div>
+            </div>}
 
             <div>
                 {cartItems.map(item => (
-                    <section key={item.id} className={isMobile ? " flex flex-col items-center border-b border-gray-200 py-4 " : "flex items-center border-b border-gray-200 py-4 "}>
+                    <section key={item.id} className={isMobile ? " flex flex-wrap items-center border-b border-gray-200 py-4 " : "flex items-center border-b border-gray-200 py-4 "}>
+
                         {(item?.Subscription_plan?.total >= item?.quantity) ?
+                            <div className="w-1/6">
+                                <input className='mx-4 h-5 w-5 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600'
+                                    type="checkbox"
+                                    checked={item.selected || false}
+                                    // defaultValue={false}
+                                    onChange={() => toggleSelect(item.id)}
+                                    id={item?.Subscription_plan?.id}
+                                />
 
-                            <input className='mx-4 w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600'
-                                type="checkbox"
-                                checked={item.selected || false}
-                                // defaultValue={false}
-                                onChange={() => toggleSelect(item.id)}
-                                id={item?.Subscription_plan?.id}
-                            />
-
-                            : null}
-
-                        <img
-                            src={item?.Subscription_plan?.Product?.image}
-                            alt={item?.Subscription_plan?.Product?.name}
-                            className="h-14 w-auto ml-4 mx-4"
-                        />
-
-                        <div className="mx-4">
-
-                            <span className="font-semibold text-base">{item?.Subscription_plan?.Product?.name}</span>
-                            <p className="text-gray-600">Price:  {VND.format(item?.Subscription_plan?.price - (item?.Subscription_plan?.price * item?.Subscription_plan?.discount_percentage / 100))} </p>
-                            <p className="text-gray-600"> {item?.Subscription_plan?.packed_name}</p>
-                            <p className="text-gray-600"> Còn lại: {item?.Subscription_plan?.total - item?.Subscription_plan?.quantity_sold}</p>
-
-                        </div>
-                        <div className="flex items-center p-2 border-2 border-gray-600 rounded-md my-2 h-2/4 mx-4 w-1/5" data-hs-input-number>
-                            <div className="flex justify-between items-center gap-x-5">
-                                <div className="grow">
-                                    {/* <input className="w-full p-2 bg-transparent border-0 text-gray-800 focus:ring-0 " type="text" onChange={() => { }} value={item?.quantity} data-hs-input-number-input ></input> */}
-                                    <input className="w-full p-2 bg-transparent border-0 text-gray-800 focus:ring-0 " type="number" onChange={() => { }} value={item?.quantity} data-hs-input-number-input ></input>
-
-                                </div>
-                                <div className="flex justify-end items-center gap-x-1.5">
-                                    <button onClick={() => handleButtonClickQuantity(item, item.quantity, -1)} type="button" className="w-6 h-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" data-hs-input-number-decrement>
-                                        <svg className="flex-shrink-0 w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /></svg>
-                                    </button>
-                                    <button onClick={() => handleButtonClickQuantity(item, item.quantity, 1)} type="button" className="w-6 h-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" data-hs-input-number-increment>
-                                        <svg className="flex-shrink-0 w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
-                                    </button>
-                                </div>
                             </div>
 
+                            : (item?.Subscription_plan?.total < item?.quantity) ? <p>Thay đổi giá trị lại</p> : null}
+
+
+                        <div className="flex w-3/6 ">
+                            <div className="w-1/3 ">
+                                <img
+                                    src={item?.Subscription_plan?.Product?.image}
+                                    alt={item?.Subscription_plan?.Product?.image || '#'}
+
+                                />
+                            </div>
+                            <div className="w-2/3">
+
+                                <Link to={`/product/${item?.Subscription_plan?.Product?.id}`}>
+                                    <span className="font-semibold text-base">{item?.Subscription_plan?.Product?.name}</span>
+                                    <p className="text-gray-600">Price:  {VND.format(item?.Subscription_plan?.price - (item?.Subscription_plan?.price * item?.Subscription_plan?.discount_percentage / 100))} </p>
+                                    <p className="text-gray-600"> {item?.Subscription_plan?.packed_name}</p>
+                                    <p className="text-gray-600"> Còn lại: {item?.Subscription_plan?.total - item?.Subscription_plan?.quantity_sold}</p>
+                                </Link>
+                            </div>
+                        </div>
+                        <div className=" w-1/6" data-hs-input-number>
+
+                            <div className="flex items-center p-1 border-2 border-gray-600 rounded-md w-fit ">
+                                <button onClick={() => handleButtonClickQuantity(item, item.quantity, -1)} type="button" className="w-6 h-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" data-hs-input-number-decrement>
+                                    <svg className="flex-shrink-0 w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /></svg>
+                                </button>
+                                <span className="px-4">{item.quantity}</span>
+                                <button onClick={() => handleButtonClickQuantity(item, item.quantity, 1)} type="button" className="w-6 h-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" data-hs-input-number-increment>
+                                    <svg className="flex-shrink-0 w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+                                </button>
+
+                            </div>
+
+
+
+                        </div>
+                        <div className="w-1/6">
+
+                            <p className="text-gray-600 ">{VND.format((item?.Subscription_plan?.price - (item?.Subscription_plan?.price * item?.Subscription_plan?.discount_percentage / 100)) * item?.quantity)} </p>
+                        </div>
+                        <div className="w-1/6">
+
+                            <button onClick={() => removeFromCart(item)} className="text-red-500 hover:underline text-base mx-4">
+                                Remove
+                            </button>
                         </div>
 
-                        <button onClick={() => removeFromCart(item)} className="text-red-500 hover:underline text-base mx-4">
-                            Remove
-                        </button>
 
-                        {(item?.Subscription_plan?.total < item?.quantity) ? <p>vui lòng thay đổi giá trị lại</p> : null}
                     </section>
                 )
 
                 )}
             </div>
             <div className='flex flex-col '>
-                <div className="mb-6 flex justify-end">
+                <div className="mb-6 mt-4 flex justify-end">
 
                     <button
                         className="bg-orange-500 text-white p-2 rounded-md focus:outline-none"
@@ -316,7 +367,7 @@ const Cart = () => {
                         onChange={handleInputVoucherCode}
                     />
                     <button onClick={applyVoucher} className="bg-orange-500 text-white px-4 py-2 rounded-md ml-2 hover:bg-orange-600">
-                        Apply Voucher
+                        Áp dụng Voucher
                     </button>
 
                 </div>
@@ -343,14 +394,14 @@ const Cart = () => {
 
 
             {/* Nút Mua Hàng */}
-            <Link to="/checkout">
-                <button className=" bg-orange-500 text-white px-4 py-2 rounded-md mt-4 hover:bg-green-600">
-                    Checkout
-                </button>
-            </Link>
+            {/* <Link to="/checkout"> */}
+            <button onClick={() => navigateToCheckout()} className=" bg-orange-500 text-white px-4 py-2 rounded-md mt-4 hover:bg-green-600">
+                Mua Hàng
+            </button>
+            {/* </Link> */}
 
             {/* Hiển thị số lượng sản phẩm trong giỏ hàng */}
-            <p className="text-gray-600 mt-2">Items in Cart: {cartItems.length}</p>
+
         </div>
     );
 };
