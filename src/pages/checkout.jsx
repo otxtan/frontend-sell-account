@@ -5,6 +5,7 @@ import voucherService from '../services/voucherService';
 import { ToastContainer, toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
 import { data } from 'jquery';
+import paymentService from '../services/paymentService';
 Modal.setAppElement('#root');
 const Checkout = () => {
     const location = useLocation();
@@ -37,8 +38,9 @@ const Checkout = () => {
         });
     }
     const [voucherCode, setVoucherCode] = useState('');
-    const [paymentMethod, setPaymentMethod] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState();
     const [InputVoucherCode, setInputVoucherCode] = useState();
+    const [paymentMethods, setPaymentMethods] = useState([]);
     const handleInputVoucherCode = async (event) => {
         setInputVoucherCode(event.target.value ? event.target.value : null);
 
@@ -56,35 +58,37 @@ const Checkout = () => {
             window.removeEventListener('resize', handleResize);
         };
     }, []);
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             // const data = await cartService.getCartByUser(1);
-    //             // setCartItems(data);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setPaymentMethods(await paymentService.getAllPayment());
 
-    //         } catch (error) {
-    //             console.error('Error fetching products:', error);
-    //         }
-    //     };
 
-    //     fetchData();
-    // }, []);
+
+
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
     useEffect(() => {
         const fetchData = async () => {
             try {
 
                 console.log(location)
-                
+
                 setCartItems(location.state.selectedItems)
                 // setSelectedVoucher();
 
                 const selectedItems = cartItems.filter(item => item.selected);
-                
+
                 if (selectedItems.length >= 1 && selectedVoucher?.code) {
                     const data = await cartService.checkVoucher({ UserId: 1, Items: selectedItems, VoucherCode: selectedVoucher?.code });
                     setCheckVoucher(data);
                 }
-                
+
                 const datavoucher = await voucherService.getvoucherbyproductcategory({ product: location.state.selectedItems });
                 console.log(selectedVoucher)
                 setVoucher(datavoucher);
@@ -96,13 +100,13 @@ const Checkout = () => {
         fetchData();
     }, [selectedVoucher, cartItems]);
     const handlePaymentMethodChange = (method) => {
-        // Xử lý thay đổi phương thức thanh toán
+        
         setPaymentMethod(method);
     };
 
     const handleCheckout = () => {
         // Xử lý logic thanh toán, có thể gọi API để xác nhận đơn hàng
-        console.log('Checking out with payment method:', paymentMethod);
+        // console.log('Checking out with payment method:', paymentMethod);
     };
 
     const applyVoucher = async () => {
@@ -167,7 +171,7 @@ const Checkout = () => {
 
                             <p className="text-gray-600 ">{VND.format((item?.Subscription_plan?.price - (item?.Subscription_plan?.price * item?.Subscription_plan?.discount_percentage / 100)) * item?.quantity)} </p>
                         </div>
-                        
+
                     </section>
                 )
 
@@ -249,46 +253,40 @@ const Checkout = () => {
             {/* Section: Payment Method */}
             <div className="mb-6">
                 <label className="block text-gray-700 text-sm font-bold mb-2">Payment Method</label>
-                <div className="flex">
-                    <label className="flex items-center cursor-pointer mr-4">
-                        <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="creditCard"
-                            checked={paymentMethod === 'creditCard'}
-                            onChange={() => handlePaymentMethodChange('creditCard')}
-                        />
-                        <span className="ml-2">Credit Card</span>
-                    </label>
+                {paymentMethods?.map(item => (
 
-                    <label className="flex items-center cursor-pointer">
-                        <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="paypal"
-                            checked={paymentMethod === 'paypal'}
-                            onChange={() => handlePaymentMethodChange('paypal')}
-                        />
-                        <span className="ml-2">PayPal</span>
-                    </label>
+                    <div className="flex">
+                        <label className="flex items-center cursor-pointer mr-4">
+                            <input
+                                type="radio"
+                                name="paymentMethod"
+                                value="creditCard"
+                                // checked={paymentMethod === 'creditCard'}
+                                onChange={() => handlePaymentMethodChange(item)}
+                            />
+                            <span className="ml-2">{item.Payment_name}</span>
+                        </label>
 
-                </div>
+
+
+                    </div>
+                ))}
             </div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">Payment Method</label>
+            
 
             {/* Section: Order Summary */}
-          
+
 
             {/* Button: Checkout */}
             <p className="text-lg font-semibold mt-4">total: {VND.format(getTotalPrice().toFixed(2) || checkVoucher?.total?.toFixed(2))}</p>
             <p className="text-lg font-semibold mt-4">totalDiscount: {VND.format(checkVoucher?.totalDiscount?.toFixed(2) || 0)}</p>
-            <p className="text-lg font-semibold mt-4">totalPayment: {VND.format(checkVoucher?.totalPayment?.toFixed(2) || getTotalPrice().toFixed(2))}</p>
+            <p className="text-lg font-semibold mt-4 mb-4">totalPayment: {VND.format(checkVoucher?.totalPayment?.toFixed(2) || getTotalPrice().toFixed(2))}</p>
 
             <button
                 className="w-full bg-orange-500 text-white p-3 rounded-md hover:bg-orange-600 transition-all duration-300"
                 onClick={handleCheckout}
             >
-                Checkout
+                Thanh Toán 
             </button>
         </div>
     );
