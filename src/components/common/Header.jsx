@@ -1,11 +1,28 @@
 // src/components/Header.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from '../../assets/images/logo.png';
 import { Link } from 'react-router-dom';
 import '@fortawesome/fontawesome-free/css/all.css';
+import { useUser } from '../../context/userProvider';
+import '../../assets/styles/Header.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Header = () => {
+  const showMessage = (message) => {
+    toast.success(message, {
+      position: 'top-right',
+      autoClose: 3000, // Đóng tự động sau 3000 milliseconds (3 giây)
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+  }
+  const { user, login, logout, cartContext, setCartContext } = useUser();
   const [isListVisible, setListVisible] = useState(false);
+
+
 
   const toggleListVisibility = () => {
     setListVisible(!isListVisible);
@@ -13,6 +30,7 @@ const Header = () => {
 
   return (
     <header className="bg-gray-800 p-4">
+      <ToastContainer />
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
         {/* Logo hoặc Tên ứng dụng */}
         <div className="flex items-center mb-4 md:mb-0">
@@ -53,9 +71,10 @@ const Header = () => {
         </div>
 
         {/* Giỏ hàng và Đăng nhập/Đăng ký */}
-        <div className="flex items-center space-x-4">
-          <Link to="/cart" className="text-white hover:text-gray-300">
+        {!user ? (<div className="flex items-center space-x-4">
+          <Link to="/cart" className="text-white hover:text-gray-300 ">
             <i className="fas fa-shopping-cart text-2xl"></i>
+
           </Link>
           <Link to="/login" className="text-white hover:text-gray-300">
             Login
@@ -63,7 +82,23 @@ const Header = () => {
           <Link to="/register" className="bg-orange-500 text-white-500 px-4 py-2 rounded-md hover:bg-gray-100">
             Sign Up
           </Link>
-        </div>
+        </div>) : (<div className="flex items-center space-x-4">
+          <Link to="/cart" className="text-white hover:text-gray-300">
+            <div className='cart-icon-container'>
+              <i className="fas fa-shopping-cart text-2xl"></i>
+              <span className="cart-badge">{cartContext?.length}</span>
+              {console.log(cartContext?.length)}
+            </div>
+          </Link>
+          <Link to="/dashboard" className="text-white hover:text-gray-300">
+            {user.username}
+          </Link>
+          <button to="/login" onClick={logout} className="bg-orange-500 text-white-500 px-4 py-2 rounded-md hover:bg-gray-100">
+            Logout
+          </button>
+        </div>)}
+
+
       </div>
     </header>
   );

@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import productService from '../services/productService';
-import { useParams } from 'react-router-dom';
+import { Navigate, Outlet, useParams } from 'react-router-dom';
 import Alert from '../components/common/Alert';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import cartService from '../services/cartService';
-
+import { useUser } from '../context/userProvider';
 
 const ProductDetail = () => {
+
+  const { user, login, logout, cartContext, setCartContext } = useUser();
   const { id } = useParams();
   const VND = new Intl.NumberFormat('vi-VN', {
     style: 'currency',
@@ -95,24 +97,42 @@ const ProductDetail = () => {
   };
   const handleButtonClickAddToCart = async () => {
     try {
-      if (planChoose != null) {
+       
+      if (user) {
 
-        const data = await cartService.addToCart({
-          UserId: 1,
-          SubscriptionPlanId: planChoose,
-          quantity: quantity
-        });
-        if (data?.id) showMessage('Thêm vào giỏ hàng thành công');
-      } else {
-        if (product?.subscriptionPlans?.length == 1) {
-          console.log()
+        if (planChoose != null) {
+
           const data = await cartService.addToCart({
-            UserId: 1,
-            SubscriptionPlanId: (product?.subscriptionPlans[0]?.id),
+            UserId: user.UserId,
+            SubscriptionPlanId: planChoose,
             quantity: quantity
           });
-          if (data?.id) showMessage('Thêm vào giỏ hàng thành công');
+          if (data?.id) {
+            showMessage('Thêm vào giỏ hàng thành công');
+            const dataCart = await cartService.getCartByUser(user?.UserId || null);
+            setCartContext(dataCart);
+
+
+          }
+        } else {
+          if (product?.subscriptionPlans?.length == 1) {
+            console.log()
+            const data = await cartService.addToCart({
+              UserId: 1,
+              SubscriptionPlanId: (product?.subscriptionPlans[0]?.id),
+              quantity: quantity
+            });
+            if (data?.id) {
+              showMessage('Thêm vào giỏ hàng thành công');
+              const dataCart = await cartService.getCartByUser(user.UserId || null);
+              setCartContext(dataCart);
+
+
+            }
+          }
         }
+      }else{
+        showMessage('Vui lòng đăng nhập');
       }
 
 
@@ -164,7 +184,7 @@ const ProductDetail = () => {
                 </div>
                 <div className="mt-3 flex items-center text-sm font-medium text-gray-600">
                   <svg className="mr-2 block h-4 w-4 align-middle text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" className=""></path>
+                    <path fillRule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" className=""></path>
                   </svg>
                   Save {discountPercentage}% right now
                 </div>
@@ -175,7 +195,7 @@ const ProductDetail = () => {
                 </div>
                 <div className="mt-3 flex items-center text-sm font-medium text-gray-600">
                   <svg className="mr-2 block h-4 w-4 align-middle text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" className=""></path>
+                    <path fillRule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" className=""></path>
                   </svg>
                   Save {discountPercentage}% right now
                 </div>
@@ -223,7 +243,7 @@ const ProductDetail = () => {
             </div>
           </section>
 
-          <div className="p-2 border-2 border-gray-600 mx-1 rounded-md my-2 w-1/3" data-hs-input-number>
+          {/* <div className="p-2 border-2 border-gray-600 mx-1 rounded-md my-2 w-1/3" data-hs-input-number>
             <div className="w-full flex justify-between items-center gap-x-5">
               <div className="grow">
 
@@ -231,13 +251,29 @@ const ProductDetail = () => {
               </div>
               <div className="flex justify-end items-center gap-x-1.5">
                 <button onClick={() => handleButtonClickQuantity(-1)} type="button" className="w-6 h-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" data-hs-input-number-decrement>
-                  <svg className="flex-shrink-0 w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /></svg>
+                  <svg className="flex-shrink-0 w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /></svg>
                 </button>
                 <button onClick={() => handleButtonClickQuantity(1)} type="button" className="w-6 h-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" data-hs-input-number-increment>
-                  <svg className="flex-shrink-0 w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+                  <svg className="flex-shrink-0 w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
                 </button>
               </div>
             </div>
+          </div> */}
+          <div className=" w-1/6" data-hs-input-number>
+
+            <div className="flex items-center p-1 border-2 border-gray-600 rounded-md w-fit ">
+              <button onClick={() => handleButtonClickQuantity(-1)} type="button" className="w-6 h-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" data-hs-input-number-decrement>
+                <svg className="flex-shrink-0 w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /></svg>
+              </button>
+              <span className="px-4">{quantity}</span>
+              <button onClick={() => handleButtonClickQuantity(1)} type="button" className="w-6 h-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" data-hs-input-number-increment>
+                <svg className="flex-shrink-0 w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+              </button>
+
+            </div>
+
+
+
           </div>
 
           <div>

@@ -1,34 +1,53 @@
 // LoginForm.js
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import authService from '../services/auth';
 import { ToastContainer, toast } from 'react-toastify';
+import { useUser } from '../context/userProvider';
+
 const showMessage = (message) => {
   toast.success(message, {
-      position: 'top-right',
-      autoClose: 3000, // Đóng tự động sau 3000 milliseconds (3 giây)
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
+    position: 'top-right',
+    autoClose: 3000, // Đóng tự động sau 3000 milliseconds (3 giây)
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
   });
 }
+
 const LoginForm = () => {
+  const navigate = useNavigate();
+  const { user, login, logout,setAccessToken } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  useEffect(() => {
+    
+    if (user) {
+      showMessage("Đăng nhập thành công");
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const handleLogin = async () => {
-    // Logic for handling login
-    // console.log('Logging in with:', email, password);
+   
     try {
-      
-      const data = await authService.login({username:email,password:password});
-      window.localStorage.setItem("accessToken",data.accessToken );
+
+      const data = await authService.login({ username: email, password: password });
+      window.localStorage.setItem("accessToken", data.accessToken);
       showMessage("Đăng nhập thành công");
+      
+      const payloadBase64  = data.accessToken.split(".")[1];
+      const payload = atob(payloadBase64 );
+      login(JSON.parse(payload));
+      setAccessToken(true);
+
+      
     } catch (error) {
       showMessage("Đăng nhập thất bại");
+      console.log(error)
     }
-    
+
   };
 
   return (

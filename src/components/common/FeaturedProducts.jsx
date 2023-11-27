@@ -74,19 +74,19 @@ const FeaturedProducts = () => {
     <div className="">
       <h2 className="text-2xl font-bold mb-4">Sản Phẩm Nổi Bật</h2>
       <div className="grid grid-cols-3 gap-4">
-        {products.items.map((item) => (
-          <Link to={`/product/${item.product.id}`}>
+        {products?.items?.map((item) => (
+          <Link to={`/product/${item?.product?.id}`}>
 
-            <div key={item.product.id} className="border p-4">
-              <img src={item.product.image!=""?item.product.image:'https://gamikey.com/wp-content/uploads/2023/08/Banner-Kapersky.png.webp'} alt={item.product.name} className="mb-2" />
-              <p className="font-bold">{item.product.name}</p>
-              {item.subscriptionPlans.length>1?(<p>Giá: ${item.subscriptionPlans[0].price}-{item.subscriptionPlans[item.subscriptionPlans.length-1].price}</p>):(<p>Giá: ${item.subscriptionPlans[0].price}</p>)}
+            <div key={item?.product?.id} className="border p-4">
+              <img src={item?.product?.image!=""?item?.product?.image:'https://gamikey.com/wp-content/uploads/2023/08/Banner-Kapersky.png.webp'} alt={item.product.name} className="mb-2" />
+              <p className="font-bold">{item?.product?.name}</p>
+              {item?.subscriptionPlans?.length>1?(<p>Giá: ${item?.subscriptionPlans[0]?.price}-{item?.subscriptionPlans[item?.subscriptionPlans.length-1].price}</p>):(<p>Giá: ${item.subscriptionPlans[0]?.price}</p>)}
               
-              {item.subscriptionPlans.discount && (
-                <p>Giảm giá: {item.subscriptionPlans.discount}%</p>
+              {item?.subscriptionPlans?.discount && (
+                <p>Giảm giá: {item?.subscriptionPlans?.discount}%</p>
               )}
-              <p>Đã bán: {item.totalSold}</p>
-              <p>Số sao: {item.rating}</p>
+              <p>Đã bán: {item?.totalSold}</p>
+              <p>sao: {item?.rating}</p>
             </div>
           </Link>
         ))}

@@ -1,7 +1,22 @@
-/* Header.css */
-@media (min-width: 768px) {
-    /* Add styles for larger screens (e.g., PC) */
-  }
-  
-  /* Add any additional styles for smaller screens (e.g., mobile) */
-  
+/* Định dạng cho container chứa biểu tượng và số */
+.cart-icon-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Định dạng cho biểu tượng */
+.cart-icon {
+  font-size: 2rem; /* Kích thước của biểu tượng */
+}
+
+/* Định dạng cho số */
+.cart-badge {
+  position: absolute;
+  /* top:  */
+ 
+  transform: translate(-50%, -50%); /* Canh giữa theo cả chiều rộng và chiều cao */
+  background-color: #f97316; /* Màu nền của số */
+  color: white; /* Màu chữ của số */
+  border-radius: 50%; /* Bo tròn số */
+  padding: 0.1rem 0.6rem; /* Kích thước đệm cho số */
+}

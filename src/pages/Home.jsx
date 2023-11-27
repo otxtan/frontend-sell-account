@@ -1,17 +1,32 @@
 // src/components/common/Header.js
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import FeaturedSlider from '../components/common/FeaturedSlider';
 import CategoryList from '../components/common/CategoryList';
 import FeaturedProducts from '../components/common/FeaturedProducts';
+import { ToastContainer, toast } from 'react-toastify';
+import { useUser } from '../context/userProvider';
 import '../App.css';
+import cartService from '../services/cartService';
 
 const Home = () => {
+  const { user, login, logout, cartContext, setCartContext } = useUser();
+  const showMessage = (message) => {
+    toast.success(message, {
+      position: 'top-right',
+      autoClose: 3000, // Đóng tự động sau 3000 milliseconds (3 giây)
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+  }
+
   return (
     <div className='bg-gray-100' >
-      
+       <ToastContainer />
       <div class="mx-20 my-auto p-4">
         <div className='flex flex-row mx-2'>
           <div className='w-3/5'><FeaturedSlider /></div>

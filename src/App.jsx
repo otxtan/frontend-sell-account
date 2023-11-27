@@ -18,37 +18,45 @@ import ForgotPassword from './pages/ForgotPassword';
 import Checkout from './pages/checkout';
 import PaymentResult from './pages/paymentResult';
 import ProductDetail from './pages/productDetail';
+import PrivateRoutes from './context/PrivateRoutes';
+import { UserProvider } from './context/userProvider';
+import OrderDetail from './components/features/OrderDetail';
 const App = () => {
-  return (
-    <Router>
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <div className="flex-1">
-          <Routes>
-            {/* Set up a Route for the Home component */}
-            <Route path="/" element={<Home />} />
-            <Route path="/product/:id" element={<ProductDetail/>}/>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<Dashboard />} >
-              <Route path="/dashboard/" element={<UserInfo />} />
-              <Route path="/dashboard/user-info" element={<UserInfo />} />
-              <Route path="/dashboard/orders" element={<Orders />} />
-              <Route path="/dashboard/account-management" element={<AccountManagement />} />
-            </Route>
-            <Route path="/logout" element={<Logout />} />
-            <Route path="/" element={<UserInfo />} />
-            <Route path='/cart' element={<Cart />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/payment-result" element={<PaymentResult/>} />
 
-            {/* Add other routes if needed */}
-          </Routes>
+  return (
+    <UserProvider>
+
+      <Router>
+        <div className="flex flex-col min-h-screen">
+          <Header />
+          <div className="flex-1">
+            <Routes>
+              {/* Set up a Route for the Home component */}
+              <Route path="/" element={<Home />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+
+              <Route path="/logout" element={<Logout />} />
+              {/* <Route path="/" element={<UserInfo />} /> */}
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+
+              <Route element={<PrivateRoutes />}>
+                <Route path="/dashboard/*" element={<Dashboard />} >
+
+                </Route>
+                <Route path='/cart' element={<Cart />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/payment-result" element={<PaymentResult />} />
+
+              </Route>
+              {/* Add other routes if needed */}
+            </Routes>
+          </div>
+          <Footer />
         </div>
-        <Footer />
-      </div>
-    </Router>
+      </Router>
+    </UserProvider>
   );
 };
 

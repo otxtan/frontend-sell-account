@@ -1,15 +1,25 @@
 // UserInfo.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import customerService from '../../services/customerService';
+import { useUser } from '../../context/userProvider';
 
 const UserInfo = () => {
-  // Giả sử có một số thông tin người dùng để hiển thị
-  const user = {
-    username: 'john_doe',
-    fullName: 'John Doe',
-    email: 'john.doe@example.com',
-    address: ''
-    // Thêm thông tin khác nếu cần
-  };
+const [customer,setCustomer]=useState(null);
+  
+  const {user} =useUser();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await customerService.findone(user.UserId);
+        console.log(data);
+        setCustomer(data);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div>
@@ -20,7 +30,7 @@ const UserInfo = () => {
           <input
             type="text"
             id="username"
-            value={user.username}
+            value={user?.username||''}
             readOnly
             className="mt-1 p-2 w-full border rounded-md"
           />
@@ -29,28 +39,28 @@ const UserInfo = () => {
           <label htmlFor="fullName" className="block text-sm font-medium text-gray-600">Full Name:</label>
           <input
             type="text"
-            id="fullName"
-            value={user.fullName}
+            id="full_name"
+            value={customer?.full_name||''}
             readOnly
             className="mt-1 p-2 w-full border rounded-md"
           />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-600">Email:</label>
+          <label htmlFor="phone_number" className="block text-sm font-medium text-gray-600">Email:</label>
           <input
             type="text"
-            id="email"
-            value={user.email}
+            id="phone_number"
+            value={customer?.phone_number||''}
             readOnly
             className="mt-1 p-2 w-full border rounded-md"
           />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-600">Address:</label>
+          <label htmlFor="email_address" className="block text-sm font-medium text-gray-600">Address:</label>
           <input
             type="text"
-            id="email"
-            value={user.Address}
+            id="email_address"
+            value={customer?.email_address||''}
             readOnly
             className="mt-1 p-2 w-full border rounded-md"
           />
