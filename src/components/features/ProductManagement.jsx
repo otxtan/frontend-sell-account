@@ -31,6 +31,7 @@ const ProductManager = () => {
     const [ModalContent, setModalContent] = useState(null);
     const [paginationArray, setPaginationArray] = useState([]);
     const [pageNumber, setPageNumber] = useState(1);
+    const [deleteProduct, setDeleteProduct] = useState();
 
 
     // view add
@@ -481,11 +482,33 @@ const ProductManager = () => {
             </div>
         );
     }
-    const removeElement = (item) => {
-        return (
-            <div>xoas </div>
-        );
-    }
+    // const handleClickDeleteProduct=()=>
+    // const RemoveElement = (props) => {
+    //     const handleClickDeleteProduct = (item) => {
+
+
+    //     }
+    //     return (
+    //         <div>
+    //             <button onClick={() => handleClickDeleteProduct(props?.value?.product)} type="button" data-drawer-target="drawer-update-product" data-drawer-show="drawer-update-product" aria-controls="drawer-update-product" className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-orange-600 rounded-lg hover:bg-orange-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+    //                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 -ml-0.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+    //                     <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path>
+    //                     <path fillRule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clipRule="evenodd"></path>
+    //                 </svg>
+    //                 Delete
+    //             </button>
+    //             <button onClick={() => closeModal} type="button" data-drawer-target="drawer-update-product" data-drawer-show="drawer-update-product" aria-controls="drawer-update-product" className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-orange-600 rounded-lg hover:bg-orange-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+    //                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 -ml-0.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+    //                     <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path>
+    //                     <path fillRule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clipRule="evenodd"></path>
+    //                 </svg>
+    //                 Delete
+    //             </button>
+
+    //         </div>
+
+    //     );
+    // }
 
     const handleClickAddElement = () => {
         openModal();
@@ -495,10 +518,7 @@ const ProductManager = () => {
         openModal();
         setModalContent(<EditElement value={item} />);
     }
-    const handleClickRemove = (item) => {
-        openModal();
-        setModalContent(removeElement(item));
-    }
+
     const handleClickPreview = (item) => {
         openModal();
         setModalContent(PreviewElement(item));
@@ -537,7 +557,16 @@ const ProductManager = () => {
 
         fetchData();
     }, []);
+    const handleClickRemove = async (item) => {
+        // openModal();
+        // setModalContent(<RemoveElement value={item} />);
+        console.log(item)
+        const result = await productService.delete(item.product.id);
+        Alert.showMessage(result.message);
+        const findIndex = products?.items?.findIndex(i => i.product.id === item.product.id);
 
+        setProducts(products?.items?.splice(findIndex, 1));
+    }
     const handleClickPrevious = () => {
         if (pageNumber >= 2) {
             setPageNumber(pageNumber - 1);
@@ -885,7 +914,9 @@ const ProductManager = () => {
             </div>
         );
     }
-
+    const handleClickDeleteProduct = (item) => {
+        setDeleteProduct(item)
+    }
     return (
         <div className="container">
             {/* modal */}
@@ -1007,14 +1038,34 @@ const ProductManager = () => {
                                                     Preview
                                                 </button>
                                             </div>
-                                            <div>
+                                            {
+                                                item.product.id != deleteProduct?.id ?
+                                                    <div>
 
-                                                <button onClick={() => handleClickRemove(1)} className='flex items-center text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900'>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 -ml-0.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd"></path>
-                                                    </svg>
-                                                    Delete</button>
-                                            </div>
+                                                        <button onClick={() => { setDeleteProduct(item?.product) }} className='flex items-center text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900'>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 -ml-0.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd"></path>
+                                                            </svg>
+                                                            Delete</button>
+                                                    </div> :
+                                                    <div>
+
+                                                        <button onClick={() => handleClickRemove(item)} className='flex items-center text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900 my-2'>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 -ml-0.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd"></path>
+                                                            </svg>
+                                                            Delete</button>
+
+                                                        <button onClick={() => setDeleteProduct()} className='flex items-center text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900 my-2'>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 -ml-0.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd"></path>
+                                                            </svg>
+                                                            Cancel</button>
+                                                    </div>
+
+
+                                            }
+
                                         </div>
                                     </td>
                                 </tr>

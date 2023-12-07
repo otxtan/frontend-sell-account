@@ -103,9 +103,17 @@ const productService = {
     }
 
   },
+  delete: async (id) => {
+    try {
+      const response = await axios.delete(`${url}/product/${id}`);
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      throw error;
+    }
 
-
-
+  },
 
 
   // ... other product-related API calls
