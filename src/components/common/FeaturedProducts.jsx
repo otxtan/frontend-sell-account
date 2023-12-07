@@ -59,7 +59,7 @@ const FeaturedProducts = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await productService.getAllProductsByPage({page:1,size:5,categoryname:'Mạng xã hội'});
+        const data = await productService.getAllProductsByPage({page:1,size:10,categoryname:'Mạng xã hội'});
         // console.log(data);
         setProducts(data);
       } catch (error) {

@@ -64,10 +64,8 @@ const Header = () => {
             placeholder="Search..."
             className="border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:border-blue-500 w-full md:w-64"
           />
-          <button className="md:absolute right-2 top-1/2 transform -translate-y-1/2">
-            {/* Thêm biểu tượng tìm kiếm ở đây (ví dụ: Font Awesome) */}
-            <i className="fas fa-search text-white"></i>
-          </button>
+         
+         
         </div>
 
         {/* Giỏ hàng và Đăng nhập/Đăng ký */}

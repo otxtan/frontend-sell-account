@@ -6,6 +6,7 @@ import Orders from '../components/features/Orders';
 import OrderDetail from '../components/features/OrderDetail';
 import AccountManagement from '../components/features/AccountManagement';
 import Sidebar from '../components/common/SidebarDashBoard';
+import RoleManager from '../components/features/RoleManager';
 
 const Dashboard = () => {
 
@@ -25,6 +26,7 @@ const Dashboard = () => {
                         <Route path="user-info" element={<UserInfo />} />
                         <Route path="orders" element={<Orders />} />
                         <Route path="order-details/" element={<OrderDetail />} />
+                        
                         {/* <Route path="/dashboard/account-management" element={<AccountManagement />} /> */}
                         <Route
                             path="/"

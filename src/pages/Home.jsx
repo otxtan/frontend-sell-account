@@ -27,7 +27,7 @@ const Home = () => {
   return (
     <div className='bg-gray-100' >
        <ToastContainer />
-      <div class="mx-20 my-auto p-4">
+      <div className="mx-20 my-auto p-4">
         <div className='flex flex-row mx-2'>
           <div className='w-3/5'><FeaturedSlider /></div>
 

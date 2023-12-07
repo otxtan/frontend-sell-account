@@ -12,21 +12,21 @@ const Sidebar = () => {
 
 
             <nav className="flex-1">
-                <div class="p-2 grid grid-rows-3 grid-flow-col gap-4">
-                    <div class="row-span-3 ...">
+                <div className="p-2 grid grid-rows-3 grid-flow-col gap-4">
+                    <div className="row-span-3 ...">
                         <img src="https://down-vn.img.susercontent.com/file/vn-11134233-7r98o-lmnn9g0zf3dre3_tn" alt=""  className='rounded-lg'/>
                     </div>
-                    <div class="col-span-2 ...">{user.username}</div>
-                    <div class="row-span-2 col-span-2 ...">Sửa thông tin</div>
+                    <div className="col-span-2 ...">{user.username}</div>
+                    <div className="row-span-2 col-span-2 ...">Sửa thông tin</div>
                 </div>
                 <ul className="space-y-2 mx-2 my-2">
                     <li>
-                        <NavLink to="/dashboard/user-info" activeClassName="text-yellow-500" className="block p-2 hover:bg-gray-700 ">
+                        <NavLink to="/dashboard/user-info"  className="block p-2 hover:bg-gray-700 ">
                             Tài khoản của tôi
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/dashboard/orders" activeClassName="text-yellow-500" className="block p-2 hover:bg-gray-700">
+                        <NavLink to="/dashboard/orders"  className="block p-2 hover:bg-gray-700">
                             Đơn mua
                         </NavLink>
                     </li>

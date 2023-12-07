@@ -21,6 +21,9 @@ import ProductDetail from './pages/productDetail';
 import PrivateRoutes from './context/PrivateRoutes';
 import { UserProvider } from './context/userProvider';
 import OrderDetail from './components/features/OrderDetail';
+import CMS from './pages/CMS';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const App = () => {
 
   return (
@@ -28,6 +31,7 @@ const App = () => {
 
       <Router>
         <div className="flex flex-col min-h-screen">
+        <ToastContainer />
           <Header />
           <div className="flex-1">
             <Routes>
@@ -40,7 +44,7 @@ const App = () => {
               <Route path="/logout" element={<Logout />} />
               {/* <Route path="/" element={<UserInfo />} /> */}
               <Route path="/forgot-password" element={<ForgotPassword />} />
-
+              <Route path="/cms/*" element={<CMS/>} />
               <Route element={<PrivateRoutes />}>
                 <Route path="/dashboard/*" element={<Dashboard />} >
 
