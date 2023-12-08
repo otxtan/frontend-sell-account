@@ -20,24 +20,10 @@ const SidebarCMS = () => {
                     <div className="row-span-2 col-span-2 ...">Sửa thông tin</div>
                 </div>
                 <ul className="space-y-2 mx-2 my-2">
+                   
                     <li>
-                        <NavLink to="/cms/role-manager"  className="block p-2 hover:bg-gray-700 ">
-                            Quyền
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/cms/orders" className="block p-2 hover:bg-gray-700">
+                        <NavLink to="/cms/user-manager" className="block p-2 hover:bg-gray-700">
                             Người Dùng
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/cms/orders" className="block p-2 hover:bg-gray-700">
-                            Khách hàng
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/cms/orders"  className="block p-2 hover:bg-gray-700">
-                            Loại,Phân loại
                         </NavLink>
                     </li>
                     <li>
@@ -46,28 +32,19 @@ const SidebarCMS = () => {
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/cms/orders"  className="block p-2 hover:bg-gray-700">
+                        <NavLink to="/cms/voucher-manager" className="block p-2 hover:bg-gray-700">
+                            Voucher
+                        </NavLink>
+                    </li>
+                    
+                    <li>
+                        <NavLink to="/cms/account-manager"  className="block p-2 hover:bg-gray-700">
                             Tài khoản
                         </NavLink>
                     </li>
                     <li>
                         <NavLink to="/cms/orders"  className="block p-2 hover:bg-gray-700">
-                            Gói 
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/cms/orders"  className="block p-2 hover:bg-gray-700">
                             Giao dịch
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/cms/orders"  className="block p-2 hover:bg-gray-700">
-                            Chi tiết giao dịch
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/cms/orders"  className="block p-2 hover:bg-gray-700">
-                            Đơn mua
                         </NavLink>
                     </li>
                     <li>

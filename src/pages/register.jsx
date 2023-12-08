@@ -2,24 +2,16 @@
 import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import authService from '../services/auth';
+import Alert from '../components/common/Alert';
 const RegisterForm = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const showMessage = (message) => {
-    toast.success(message, {
-        position: 'top-right',
-        autoClose: 3000, // Đóng tự động sau 3000 milliseconds (3 giây)
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-    });
-}
+ 
   const handleRegister = async () => {
     console.log(username)
     const data =await authService.register({username:username,email_address:email,password:password})
-    showMessage(data);
+    Alert.showMessage(data);
   };
 
   return (

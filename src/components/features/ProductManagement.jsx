@@ -14,6 +14,7 @@ import uploads from '../../services/uploadsService';
 import SelectCustom from '../common/SelectCustom';
 import categoryService from '../../services/categoryService';
 import typeService from '../../services/TypeService';
+import ProductDetail from '../../pages/productDetail';
 Modal.setAppElement('#root');
 const ProductManager = () => {
     const VND = new Intl.NumberFormat('vi-VN', {
@@ -50,6 +51,14 @@ const ProductManager = () => {
         })
         const handleSubmitProduct = async (e) => {
             e.preventDefault();
+            if(formDataProduct.ProductCategoryId==0){
+                Alert.showMessage('Please select Category ')
+                return
+            }
+            if(formDataProduct.ProductTypeId==0){
+                Alert.showMessage('Please select Type ')
+                return
+            }
             console.log(formDataProduct)
             Alert.showMessage(await productService.create(formDataProduct));
             const data = await productService.getAllProductsCategoryTypeByPage({ page: pageNumber, size: 10 });
@@ -238,8 +247,8 @@ const ProductManager = () => {
                             published: e.target.value,
                         })
                     }}>
-                        <option className='bg-gray-800 p-3' value="1">YES</option>
                         <option className='bg-gray-800 p-3' value="0">NO</option>
+                        <option className='bg-gray-800 p-3' value="1">YES</option>
                     </select>
                     {/* <input className='bg-gray-500 rounded-md p-2' type="text" name="ProductId" value={formDataSubscription.ProductId} onChange={handleChangeFormSubscription} /> */}
                 </div>
@@ -463,8 +472,8 @@ const ProductManager = () => {
                             published: e.target.value,
                         })
                     }}>
-                        <option className='bg-gray-800 p-3' value="1">YES</option>
                         <option className='bg-gray-800 p-3' value="0">NO</option>
+                        <option className='bg-gray-800 p-3' value="1">YES</option>
                     </select>
                     {/* <input className='bg-gray-500 rounded-md p-2' type="text" name="ProductId" value={formDataSubscription.ProductId} onChange={handleChangeFormSubscription} /> */}
                 </div>
@@ -475,11 +484,9 @@ const ProductManager = () => {
     };
     // view edit
 
-    const PreviewElement = () => {
+    const PreviewElement = (item) => {
         return (
-            <div>
-                edit
-            </div>
+            <ProductDetail value={item}/>
         );
     }
     // const handleClickDeleteProduct=()=>
@@ -521,7 +528,7 @@ const ProductManager = () => {
 
     const handleClickPreview = (item) => {
         openModal();
-        setModalContent(PreviewElement(item));
+        setModalContent(<PreviewElement value={item}/>);
     }
     const handleClickSubscriptions = (items, product) => {
         openModal();
@@ -944,7 +951,11 @@ const ProductManager = () => {
             <div className='bg-gray-800 p-2'>
                 {/* header */}
                 <div className='my-2 mx-auto flex flex-wrap mb-4 space-x-4'>
-                    <input type="text" className=' basis-2/6 rouded rounded-md px-2' placeholder='Search' />
+                    <input onChange={async (e)=>{ 
+                       const data = await productService.getAllProductsCategoryTypeByPage({ page: pageNumber, size: 10,name:e.target.value });
+                       console.log(data);
+                       setProducts(data);
+                    }} type="text" className=' basis-2/6 rouded rounded-md px-2' placeholder='Search' />
 
                     <button className='basis-1/6 bg-orange-500 flex items-center justify-center rounded rounded-md px-2 py-2 text-white ' onClick={handleClickAddElement}>
                         <svg className="h-3.5 w-3.5 mr-1.5 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -965,6 +976,7 @@ const ProductManager = () => {
                             <tr>
                                 <th>Image</th>
                                 <th>Name</th>
+                                <th>Pulished</th>
                                 <th>Type</th>
                                 <th>Category</th>
                                 <th>Subscription plan</th>
@@ -978,15 +990,16 @@ const ProductManager = () => {
                             {products.items?.map(item => (
                                 <tr key={item?.product?.id} className='border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'>
                                     <td className='px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'>
-                                        <img src={item?.product?.image} alt="image" srcSet="https://down-vn.img.susercontent.com/file/vn-11134233-7r98o-lmnn9g0zf3dre3_tn" style={{
+                                        <img src={item?.product?.image} alt="image"  style={{
                                             width: '100%',
                                             height: 'auto',
                                             aspectRatio: '16 / 9',
-                                            objectFit: 'cover',
+                                            objectFit: 'contain',
                                         }} />
 
                                     </td>
                                     <td className='px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'>{item?.product?.name} </td>
+                                    <td className='px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'>{String(item?.product?.published)} </td>
                                     <td className='px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'>
                                         <span className='p-2 bg-blue-400 rounded-md'>
                                             {item?.product?.Product_type?.product_type_name}
@@ -1030,7 +1043,7 @@ const ProductManager = () => {
                                             </div>
                                             <div>
 
-                                                <button onClick={() => handleClickPreview(1)} type="button" data-drawer-target="drawer-read-product-advanced" data-drawer-show="drawer-read-product-advanced" aria-controls="drawer-read-product-advanced" className="py-2 px-3 flex items-center text-sm font-medium text-center text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                                                <button onClick={() => handleClickPreview(item?.product)} type="button" data-drawer-target="drawer-read-product-advanced" data-drawer-show="drawer-read-product-advanced" aria-controls="drawer-read-product-advanced" className="py-2 px-3 flex items-center text-sm font-medium text-center text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 mr-2 -ml-0.5">
                                                         <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"></path>
                                                         <path fillRule="evenodd" clipRule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z"></path>

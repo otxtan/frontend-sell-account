@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import cartService from '../services/cartService';
 import { useUser } from '../context/userProvider';
 
-const ProductDetail = () => {
+const ProductDetail = (props) => {
 
   const { user, login, logout, cartContext, setCartContext } = useUser();
   const { id } = useParams();
@@ -21,7 +21,8 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await productService.getProductDetail(id);
+        console.log(id)
+        const data = await productService.getProductDetail(id||props.value.value.id);
         console.log(data);
         setProduct(data);
       } catch (error) {
@@ -43,7 +44,7 @@ const ProductDetail = () => {
       const foundProduct = product.subscriptionPlans.find(item => item.id === planChoose);
 
       if (foundProduct.total - foundProduct.quantity_sold < 0 || quantity + value > foundProduct.total - foundProduct.quantity_sold) {
-        showMessage('Vượt quá số lượng');
+        Alert.showMessage('Vượt quá số lượng')
         return;
       };
       if (quantity + value < 1) return;
@@ -52,24 +53,13 @@ const ProductDetail = () => {
     } else {
       if (product?.subscriptionPlans?.length == 1) {
         if (product?.subscriptionPlans?.total - product?.subscriptionPlans?.quantity_sold < 0 || quantity + value > product?.subscriptionPlans?.total - product?.subscriptionPlans?.quantity_sold) {
-          showMessage('Vượt quá số lượng');
+          Alert.showMessage('Vượt quá số lượng')
           return;
         };
         if (quantity + value < 1) return;
         setQuantity(quantity + value);
       }
     }
-  }
-
-  const showMessage = (message) => {
-    toast.success(message, {
-      position: 'top-right',
-      autoClose: 3000, // Đóng tự động sau 3000 milliseconds (3 giây)
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-    });
   }
   const handleButtonClick = (plan) => {
     // console.log('nội dung'+plan.price)
@@ -108,7 +98,7 @@ const ProductDetail = () => {
             quantity: quantity
           });
           if (data?.id) {
-            showMessage('Thêm vào giỏ hàng thành công');
+           Alert.showMessage('Thêm vào giỏ hàng thành công');
             const dataCart = await cartService.getCartByUser(user?.UserId || null);
             setCartContext(dataCart);
 
@@ -123,7 +113,7 @@ const ProductDetail = () => {
               quantity: quantity
             });
             if (data?.id) {
-              showMessage('Thêm vào giỏ hàng thành công');
+              Alert.showMessage('Thêm vào giỏ hàng thành công');
               const dataCart = await cartService.getCartByUser(user.UserId || null);
               setCartContext(dataCart);
 
@@ -132,7 +122,7 @@ const ProductDetail = () => {
           }
         }
       }else{
-        showMessage('Vui lòng đăng nhập');
+        Alert.showMessage('Vui lòng đăng nhập');
       }
 
 
@@ -170,7 +160,7 @@ const ProductDetail = () => {
       <ToastContainer />
       <div className="flex">
         <div className="w-1/2">
-          <img src="https://gamikey.com/wp-content/uploads/2023/08/Banner-Kapersky.png.webp" alt={product?.product?.name} className="rounded-lg" />
+          <img src={product?.product?.image} alt={product?.product?.name} className="rounded-lg" />
         </div>
         <div className="w-1/2 ml-6">
           <h2 className="text-2xl font-semibold mb-4">{product?.product?.name}</h2>
