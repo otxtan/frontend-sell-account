@@ -59,7 +59,7 @@ const productService = {
     try {
 
       console.log(data)
-      const response = await axios.get(`${url}/product/findallproductcategorytypebypage?page=${data.page}&size=${data.size}&categoryid=${data.categoryid}&typeid=${data.typeid}`);
+      const response = await axios.get(`${url}/product/findallproductcategorytypebypage?page=${data.page}&size=${data.size}&categoryid=${data.categoryid}&typeid=${data.typeid}&name=${data?.name}`);
       console.log(response.data);
       return response.data;
     } catch (error) {

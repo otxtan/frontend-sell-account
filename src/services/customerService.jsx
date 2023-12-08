@@ -16,6 +16,18 @@ const customerService = {
             throw error;
         }
     },
+    findOneCustomerUserRole: async (id) => {
+        try {
+
+            const response = await axios.get(`${url}/customer/cms/${id}`);
+
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            throw error;
+        }
+    },
+    
     delete: async (id) => {
         try {
             const response = await axios.delete(`${url}/customer/${id}`);
@@ -30,7 +42,7 @@ const customerService = {
         try {
 
             console.log(`${id}, ${value}`)
-            const response = await axios.put(`${url}/customer/${id}`, { quantity: value });
+            const response = await axios.put(`${url}/customer/updatecustomermanagement/${id}`,value);
             return response.data;
         } catch (error) {
             console.error('Error fetching products:', error);
@@ -50,6 +62,18 @@ const customerService = {
             throw error;
         }
     },
+    findAllCustomerUserRoleBypage: async (data) => {
+        try {
+    
+          console.log(data)
+          const response = await axios.get(`${url}/customer/findallcustomeruserroleBypage?page=${data.page}&size=${data.size}&email=${data.email}`);
+          console.log(response.data);
+          return response.data;
+        } catch (error) {
+          console.error('Error fetching products:', error);
+          throw error;
+        }
+      },
 
 
 

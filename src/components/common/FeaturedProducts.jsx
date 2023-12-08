@@ -78,7 +78,7 @@ const FeaturedProducts = () => {
           <Link to={`/product/${item?.product?.id}`}>
 
             <div key={item?.product?.id} className="border p-4">
-              <img src={item?.product?.image!=""?item?.product?.image:'https://gamikey.com/wp-content/uploads/2023/08/Banner-Kapersky.png.webp'} alt={item.product.name} className="mb-2" />
+              <img src={item?.product?.image} alt={item.product.name} className="mb-2" />
               <p className="font-bold">{item?.product?.name}</p>
               {item?.subscriptionPlans?.length>1?(<p>Giá: ${item?.subscriptionPlans[0]?.price}-{item?.subscriptionPlans[item?.subscriptionPlans.length-1].price}</p>):(<p>Giá: ${item.subscriptionPlans[0]?.price}</p>)}
               

@@ -27,6 +27,17 @@ const roleService = {
             throw error;
         }
     },
+    findAll: async (id) => {
+        try {
+
+            const response = await axios.get(`${url}/role/getall`);
+
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            throw error;
+        }
+    },
     delete: async (id) => {
         try {
             const response = await axios.delete(`${url}/role/${id}`);
@@ -61,6 +72,7 @@ const roleService = {
             throw error;
         }
     },
+
 
 
 
