@@ -38,11 +38,7 @@ const FeaturedProducts = () => {
           <Link to={`/product/${item?.product?.id}`}>
 
             <div key={item?.product?.id} className="border p-4">
-<<<<<<< HEAD
               <img src={item?.product?.image} alt={item.product.name} className="mb-2 rounded-md" />
-=======
-              <img src={item?.product?.image} alt={item.product.name} className="mb-2" />
->>>>>>> 79902f3a1394406acf659bf62439a1c304624056
               <p className="font-bold">{item?.product?.name}</p>
               {item?.subscriptionPlans?.length > 1 ? (<p className='text-xl font-bold text-gray-900'> {VND.format(item?.subscriptionPlans[0]?.price)}-{VND.format(item?.subscriptionPlans[item?.subscriptionPlans.length - 1].price)}</p>) : (<p>Giá: {VND.format(item.subscriptionPlans[0]?.price)}</p>)}
 
