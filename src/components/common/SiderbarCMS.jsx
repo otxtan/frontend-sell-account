@@ -42,11 +42,19 @@ const SidebarCMS = () => {
                         </NavLink>
                     </li>
                     <li>
+<<<<<<< HEAD
                         <NavLink to="/cms/transaction-manager"  className="block p-2 hover:bg-gray-700">
                             Giao dịch
                         </NavLink>
                     </li>
                     {/* <li>
+=======
+                        <NavLink to="/cms/orders"  className="block p-2 hover:bg-gray-700">
+                            Giao dịch
+                        </NavLink>
+                    </li>
+                    <li>
+>>>>>>> 79902f3a1394406acf659bf62439a1c304624056
                         <NavLink to="/cms/orders"  className="block p-2 hover:bg-gray-700">
                             Phương thức thanh toán
                         </NavLink>

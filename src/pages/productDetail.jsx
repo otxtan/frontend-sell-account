@@ -22,11 +22,16 @@ const ProductDetail = (props) => {
     const fetchData = async () => {
       try {
         console.log(id)
+<<<<<<< HEAD
         const data = await productService.getProductDetail(id || props.value.value.id);
         console.log(data)
         setProductSimilar(await productService.getAllProductsByCategoryByPage({ page: 1, size: 10, categoryname: data.product.Product_category.product_category_name }));
         if (data.length <= 1)
           setPlanChoose(data.subscriptionPlans[0].id)
+=======
+        const data = await productService.getProductDetail(id||props.value.value.id);
+        console.log(data);
+>>>>>>> 79902f3a1394406acf659bf62439a1c304624056
         setProduct(data);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -122,7 +127,11 @@ const ProductDetail = (props) => {
             quantity: quantity
           });
           if (data?.id) {
+<<<<<<< HEAD
             Alert.showMessage('Thêm vào giỏ hàng thành công');
+=======
+           Alert.showMessage('Thêm vào giỏ hàng thành công');
+>>>>>>> 79902f3a1394406acf659bf62439a1c304624056
             const dataCart = await cartService.getCartByUser(user?.UserId || null);
             setCartContext(dataCart);
 
@@ -145,7 +154,11 @@ const ProductDetail = (props) => {
             }
           }
         }
+<<<<<<< HEAD
       } else {
+=======
+      }else{
+>>>>>>> 79902f3a1394406acf659bf62439a1c304624056
         Alert.showMessage('Vui lòng đăng nhập');
       }
 
@@ -184,7 +197,11 @@ const ProductDetail = (props) => {
 
       <div className="flex">
         <div className="w-1/2">
+<<<<<<< HEAD
           <img src={product?.product?.image} alt={product?.product?.name} className="rounded-lg object-cover mx-auto" />
+=======
+          <img src={product?.product?.image} alt={product?.product?.name} className="rounded-lg" />
+>>>>>>> 79902f3a1394406acf659bf62439a1c304624056
         </div>
         <div className="w-1/2 ml-6">
           <h2 className="text-2xl font-semibold mb-4">{product?.product?.name}</h2>

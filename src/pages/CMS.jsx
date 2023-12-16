@@ -2,12 +2,19 @@
 import React from 'react';
 import RoleManager from '../components/features/RoleManager';
 import ProductManagement from '../components/features/ProductManagement';
+<<<<<<< HEAD
 import UserManagement from '../components/features/UserManagement';
 import SidebarCMS from '../components/common/SiderbarCMS';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import AccountManagement from '../components/features/AccountManagement'
 import VoucherManagement from '../components/features/VoucherManagement'
 import TransactionManagement from '../components/features/OrderManagement'
+=======
+import UserManagement from '../components/features/UserMangaement';
+import SidebarCMS from '../components/common/SiderbarCMS';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import AccountManagement from '../components/features/AccountManagement'
+>>>>>>> 79902f3a1394406acf659bf62439a1c304624056
 const CMS = () => {
   return (
     <div className="flex p-10 justify-center  h-full  bg-white rounded-md shadow-md">
@@ -29,9 +36,15 @@ const CMS = () => {
                         <Route path="product-manager" element={<ProductManagement />} />
                         {/* <Route path="subscriptionplan-manager" element={<subscriptionPlanManager />} /> */}
                         <Route path="account-manager" element={<AccountManagement />} />
+<<<<<<< HEAD
                         <Route path="transaction-manager" element={<TransactionManagement />} />
                         {/* <Route path="transactiondetail-manager" element={<transactionDetailManager />} /> */}
                         <Route path="voucher-manager" element={<VoucherManagement />} />
+=======
+                        <Route path="transaction-manager" element={<transactionManager />} />
+                        {/* <Route path="transactiondetail-manager" element={<transactionDetailManager />} /> */}
+                        <Route path="voucher-manager" element={<voucherManager />} />
+>>>>>>> 79902f3a1394406acf659bf62439a1c304624056
                         <Route path="paymentmethod-manager" element={<paymentMethodManager />} />
                         {/* <Route path="/dashboard/account-management" element={<AccountManagement />} /> */}
                         {/* <Route

@@ -15,7 +15,10 @@ import SelectCustom from '../common/SelectCustom';
 import categoryService from '../../services/categoryService';
 import typeService from '../../services/TypeService';
 import ProductDetail from '../../pages/productDetail';
+<<<<<<< HEAD
 import MyEditor from '../common/MyEditText';
+=======
+>>>>>>> 79902f3a1394406acf659bf62439a1c304624056
 Modal.setAppElement('#root');
 const ProductManager = () => {
     const VND = new Intl.NumberFormat('vi-VN', {
