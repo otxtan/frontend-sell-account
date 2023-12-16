@@ -7,8 +7,8 @@ const url = process.env.REACT_APP_API_URL;
 const roleService = {
     create: async (data) => {
         try {
-
-            const response = await axios.get(`${url}/role/`,data);
+            console.log(data)
+            const response = await axios.post(`${url}/role/`,data);
 
             return response.data;
         } catch (error) {

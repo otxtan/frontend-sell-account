@@ -12,6 +12,7 @@ const PrivateRoutes = () => {
     
     // const isAuth = false;
     // user?isAuth=true:isAuth=false;
+    
     return user ? <Outlet /> : <Navigate to='/login' />
 }
 

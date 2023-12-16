@@ -24,13 +24,14 @@ export const UserProvider = ({ children }) => {
     const fetchData = async () => {
       try {
         const accesstoken = window.localStorage.getItem("accessToken");
+        console.log(accessToken)
         if (accesstoken) {
           const payloadBase64 = accesstoken.split(".")[1];
           const payload = atob(payloadBase64);
           login(JSON.parse(payload));
           // console.log(JSON.parse(payload))
           const data = await cartService.getCartByUser(JSON.parse(payload).UserId || null);
-          console.log(data.length)
+          console.log(data)
           setCartContext(data);
 
 

@@ -6,8 +6,13 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
 import { data } from 'jquery';
 import paymentService from '../services/paymentService';
+import productService from '../services/productService';
+import { useUser } from '../context/userProvider';
+import Alert from '../components/common/Alert';
+import { Link, useNavigate } from 'react-router-dom';
 Modal.setAppElement('#root');
 const Checkout = () => {
+    // const { user, login, logout, setAccessToken } = useUser();
     const location = useLocation();
 
     const [cartItems, setCartItems] = useState([]);
@@ -27,6 +32,7 @@ const Checkout = () => {
         setSelectedVoucher(voucher);
         closeModal();
     };
+    const navigate = useNavigate();
     const showMessage = (message) => {
         toast.success(message, {
             position: 'top-right',
@@ -45,6 +51,7 @@ const Checkout = () => {
         setInputVoucherCode(event.target.value ? event.target.value : null);
 
     }
+    const { user, login, logout, cartContext, setCartContext } = useUser();
 
     useEffect(() => {
         function handleResize() {
@@ -77,19 +84,21 @@ const Checkout = () => {
         const fetchData = async () => {
             try {
 
-                console.log(location)
 
-                setCartItems(location.state.selectedItems)
+                const dataSubscriptions = await productService.findAllProductCheckOut(location.state.selectedItems);
+                console.log(dataSubscriptions)
+                setCartItems(dataSubscriptions)
                 // setSelectedVoucher();
 
-                const selectedItems = cartItems.filter(item => item.selected);
+                // const selectedItems = cartItems.filter(item => item.selected);
 
-                if (selectedItems.length >= 1 && selectedVoucher?.code) {
-                    const data = await cartService.checkVoucher({ UserId: 1, Items: selectedItems, VoucherCode: selectedVoucher?.code });
+                if (dataSubscriptions.length >= 1 && selectedVoucher?.code) {
+                    const data = await cartService.checkVoucher({ UserId: user.UserId, Items: location.state.selectedItems, VoucherCode: selectedVoucher?.code });
                     setCheckVoucher(data);
+                    console.log(data)
                 }
 
-                const datavoucher = await voucherService.getvoucherbyproductcategory({ product: location.state.selectedItems });
+                const datavoucher = await voucherService.getvoucherbyproductcategory({ product: dataSubscriptions });
                 console.log(selectedVoucher)
                 setVoucher(datavoucher);
             } catch (error) {
@@ -98,15 +107,31 @@ const Checkout = () => {
         };
 
         fetchData();
-    }, [selectedVoucher, cartItems]);
+    }, [selectedVoucher]);
     const handlePaymentMethodChange = (method) => {
-        
+
         setPaymentMethod(method);
     };
 
-    const handleCheckout = () => {
+    const handleCheckout = async () => {
         // Xử lý logic thanh toán, có thể gọi API để xác nhận đơn hàng
         // console.log('Checking out with payment method:', paymentMethod);
+        if (typeof paymentMethod == 'undefined' && paymentMethod == null) {
+            Alert.showMessage("Please select payment method");
+            return;
+        }
+        const result =await paymentService.payment({
+            Items: location.state.selectedItems, PaymentMethodld: paymentMethod?.id,
+            VoucherCode: selectedVoucher ? selectedVoucher.code : "", UserId: user.UserId, cartId: location.state?.cartId || []
+        })
+        setCartContext([]);
+        console.log(result)
+        navigate("/payment-result",{state:{id:result.id}});
+
+
+
+
+
     };
 
     const applyVoucher = async () => {
@@ -117,9 +142,11 @@ const Checkout = () => {
             if (!findVoucher)
                 return showMessage("Voucher không tồn tại");
             if (selectedItems.length >= 1) {
-                const data = await cartService.checkVoucher({ UserId: 1, Items: selectedItems, VoucherCode: InputVoucherCode });
+                const data = await cartService.checkVoucher({ UserId: user.UserId, Items: selectedItems, VoucherCode: InputVoucherCode });
                 // setSelectedVoucher( await voucherService.findVoucher(selectedVoucher.code));
+                console.log(data)
                 setCheckVoucher(data);
+                setSelectedVoucher(findVoucher);
 
                 // return;
             }
@@ -134,8 +161,8 @@ const Checkout = () => {
         checkVoucher.totalDiscount = null
     }
     const getTotalPrice = () => {
-        const selectedItems = cartItems.filter(item => item.selected);
-        const subtotal = selectedItems.reduce((total, item) => total + (item?.Subscription_plan?.price - (item?.Subscription_plan?.price * item?.Subscription_plan?.discount_percentage / 100)) * item.quantity, 0);
+        // const selectedItems = cartItems;
+        const subtotal = cartItems.reduce((total, item) => total + (item?.price - (item?.price * item?.discount_percentage / 100)) * item.quantity, 0);
         return subtotal - (subtotal * (discount / 100));
     };
 
@@ -146,19 +173,19 @@ const Checkout = () => {
             <div>
                 {cartItems?.map(item => (
                     <section key={item.id} className={isMobile ? " flex flex-wrap items-center border-b border-gray-200 py-4 " : "flex items-center border-b border-gray-200 py-4 "}>
-                        <div className="flex w-4/6 ">
-                            <div className="w-1/3 ">
-                                <img
-                                    src={item?.Subscription_plan?.Product?.image}
-                                    alt={item?.Subscription_plan?.Product?.image || '#'}
+                        <div className="flex w-4/6 h-1/2">
+                            <div className="w-1/4  mx-2 ">
+                                <img className='rounded-md   '
+                                    src={item?.Product?.image}
+                                    alt={item?.Product?.image || '#'}
 
                                 />
                             </div>
-                            <div className="w-2/3">
-                                <span className="font-semibold text-base">{item?.Subscription_plan?.Product?.name}</span>
-                                <p className="text-gray-600">Price:  {VND.format(item?.Subscription_plan?.price - (item?.Subscription_plan?.price * item?.Subscription_plan?.discount_percentage / 100))} </p>
-                                <p className="text-gray-600"> {item?.Subscription_plan?.packed_name}</p>
-                                <p className="text-gray-600"> Còn lại: {item?.Subscription_plan?.total - item?.Subscription_plan?.quantity_sold}</p>
+                            <div className="w-3/4">
+                                <span className="font-semibold text-base">{item?.Product?.name}</span>
+                                <p className="text-gray-600">Price:  {VND.format(item?.price - (item?.price * item?.discount_percentage / 100))} </p>
+                                <p className="text-gray-600"> {item?.packed_name}</p>
+                                <p className="text-gray-600"> Còn lại: {item?.total - item?.quantity_sold}</p>
                             </div>
                         </div>
                         <div className=" w-1/6" data-hs-input-number>
@@ -169,7 +196,7 @@ const Checkout = () => {
                         </div>
                         <div className="w-1/6">
 
-                            <p className="text-gray-600 ">{VND.format((item?.Subscription_plan?.price - (item?.Subscription_plan?.price * item?.Subscription_plan?.discount_percentage / 100)) * item?.quantity)} </p>
+                            <p className="text-gray-600 ">{VND.format((item?.price - (item?.price * item?.discount_percentage / 100)) * item?.quantity)} </p>
                         </div>
 
                     </section>
@@ -235,21 +262,24 @@ const Checkout = () => {
                 </button>
 
             </div>
-            {
-                selectedVoucher ? (<div
-                    key={selectedVoucher?.code}
-                    className="my-2 cursor-pointer bg-orange-100 mb-4 p-2 hover:bg-gray-100 rounded-md voucher-item shadow"
-                // onClick={() => handleSelectVoucher(selectedVoucher)}
-                >
-                    <h3 className="text-lg font-semibold">{selectedVoucher?.code} - {selectedVoucher?.discount_percentage == 0 ? (`Giảm ${selectedVoucher?.discount_amount}đ`) : (`Giảm ${selectedVoucher?.discount_percentage}%`)}</h3>
-                    <p className="text-gray-600 mb-2">{`Đơn Tối Thiểu ₫${selectedVoucher?.min_order_amount}k`}</p>
-                    <p className="text-gray-600">{`HSD: ${new Date(selectedVoucher?.end_date).toLocaleDateString()} - ${new Date(selectedVoucher?.end_date).toLocaleTimeString()}`}</p>
-                    {
-                        selectedVoucher ? <button className=' p-2 bg-orange-500 shadow rounded-md text-white my-3' onClick={() => handleButtonCancel()}>Remove</button> : null
-                    }
-                </div>) : null
+            <div className='flex justify-end'>
 
-            }
+                {
+                    selectedVoucher ? (<div
+                        key={selectedVoucher?.code}
+                        className="my-2 cursor-pointer bg-orange-100 mb-4 p-2 hover:bg-gray-100 rounded-md voucher-item shadow w-1/2 "
+                    // onClick={() => handleSelectVoucher(selectedVoucher)}
+                    >
+                        <h3 className="text-lg font-semibold">{selectedVoucher?.code} - {selectedVoucher?.discount_percentage == 0 ? (`Giảm ${selectedVoucher?.discount_amount}đ`) : (`Giảm ${selectedVoucher?.discount_percentage}%`)}</h3>
+                        <p className="text-gray-600 mb-2">{`Đơn Tối Thiểu ${VND.format(selectedVoucher?.min_order_amount)} - giảm tối đa ${VND.format(selectedVoucher?.minimize)}`} </p>
+                        <p className="text-gray-600">{`HSD: ${new Date(selectedVoucher?.end_date).toLocaleDateString()} - ${new Date(selectedVoucher?.end_date).toLocaleTimeString()}`}</p>
+                        {
+                            selectedVoucher ? <button className=' p-2 bg-orange-500 shadow rounded-md text-white my-3' onClick={() => handleButtonCancel()}>Remove</button> : null
+                        }
+                    </div>) : null
+
+                }
+            </div>
             {/* Section: Payment Method */}
             <div className="mb-6">
                 <label className="block text-gray-700 text-sm font-bold mb-2">Payment Method</label>
@@ -272,21 +302,21 @@ const Checkout = () => {
                     </div>
                 ))}
             </div>
-            
+
 
             {/* Section: Order Summary */}
 
 
             {/* Button: Checkout */}
-            <p className="text-lg font-semibold mt-4">total: {VND.format(getTotalPrice().toFixed(2) || checkVoucher?.total?.toFixed(2))}</p>
-            <p className="text-lg font-semibold mt-4">totalDiscount: {VND.format(checkVoucher?.totalDiscount?.toFixed(2) || 0)}</p>
-            <p className="text-lg font-semibold mt-4 mb-4">totalPayment: {VND.format(checkVoucher?.totalPayment?.toFixed(2) || getTotalPrice().toFixed(2))}</p>
+            <p className="text-lg font-semibold mt-4">Total: {VND.format(getTotalPrice().toFixed(2) || checkVoucher?.total?.toFixed(2))}</p>
+            <p className="text-lg font-semibold mt-4">Discount: {VND.format(checkVoucher?.totalDiscount?.toFixed(2) || 0)}</p>
+            <p className="text-lg font-semibold mt-4 mb-4">Payment: {VND.format(checkVoucher?.totalPayment?.toFixed(2) || getTotalPrice().toFixed(2))}</p>
 
             <button
-                className="w-full bg-orange-500 text-white p-3 rounded-md hover:bg-orange-600 transition-all duration-300"
+                className="w-1/2 bg-orange-500 text-white p-3 rounded-md hover:bg-orange-600 transition-all duration-300"
                 onClick={handleCheckout}
             >
-                Thanh Toán 
+                Thanh Toán
             </button>
         </div>
     );

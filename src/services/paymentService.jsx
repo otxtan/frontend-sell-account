@@ -15,6 +15,17 @@ const paymentService = {
       throw error;
     }
   },
+  payment: async (data) => {
+    try {
+      
+      const response = await axios.post(`${url}/cart/payment/`,data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching payment:', error);
+      throw error;
+    }
+  },
+
 
   // ... other product-related API calls
 };

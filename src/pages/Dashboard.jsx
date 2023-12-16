@@ -12,15 +12,15 @@ const Dashboard = () => {
 
     return (
 
-        <div className="container flex mx-auto mt-10 p-6 bg-white rounded-md shadow-md">
+        <div className="flex p-10 justify-center  h-full  bg-white rounded-md shadow-md">
 
             {/* Sidebar */}
             <Sidebar />
 
             {/* Main Content */}
-            <div className=" w-4/5 mx-auto h-screen">
+            <div className=" w-4/5">
 
-                <main className=" overflow-x-hidden h-full overflow-y-auto bg-gray-200 p-4">
+                <main className="overflow-x-hidden h-full overflow-y-auto bg-gray-900 mx-2 rounded-md p-2">
 
                     <Routes>
                         <Route path="user-info" element={<UserInfo />} />

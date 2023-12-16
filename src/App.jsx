@@ -24,19 +24,21 @@ import OrderDetail from './components/features/OrderDetail';
 import CMS from './pages/CMS';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import SearchProduct from './pages/Search';
 const App = () => {
 
   return (
     <UserProvider>
 
       <Router>
-        <div className="flex flex-col min-h-screen">
-        <ToastContainer />
+        <div className="flex flex-col min-h-screen ">
+          <ToastContainer />
           <Header />
-          <div className="flex-1">
+          <main className="flex-1">
             <Routes>
               {/* Set up a Route for the Home component */}
               <Route path="/" element={<Home />} />
+              <Route path="/search" element={<SearchProduct />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
@@ -44,11 +46,9 @@ const App = () => {
               <Route path="/logout" element={<Logout />} />
               {/* <Route path="/" element={<UserInfo />} /> */}
               <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/cms/*" element={<CMS/>} />
               <Route element={<PrivateRoutes />}>
-                <Route path="/dashboard/*" element={<Dashboard />} >
-
-                </Route>
+              <Route path="/cms/*" element={<CMS />} />
+                <Route path="/dashboard/*" element={<Dashboard />} />
                 <Route path='/cart' element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/payment-result" element={<PaymentResult />} />
@@ -56,7 +56,7 @@ const App = () => {
               </Route>
               {/* Add other routes if needed */}
             </Routes>
-          </div>
+          </main>
           <Footer />
         </div>
       </Router>

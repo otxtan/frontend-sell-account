@@ -10,6 +10,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useUser } from '../context/userProvider';
 import '../App.css';
 import cartService from '../services/cartService';
+import ShowAllProudctss from '../components/common/ShowAllProducts';
 
 const Home = () => {
   const { user, login, logout, cartContext, setCartContext } = useUser();
@@ -33,7 +34,7 @@ const Home = () => {
 
 
           <div className=' flex-col w-2/5 mx-6 '>
-            <img src="https://gamikey.com/wp-content/uploads/2023/09/Adobe-Pro-Edition-Banner-1536x768.png" alt="Slide 3" className='rounded-3xl p-2' />
+            <img src="https://gamikey.com/wp-content/uploads/2023/04/Canva-1024x512.jpg.webp" alt="Slide 3" className='rounded-3xl p-2' />
             <img src="https://gamikey.com/wp-content/uploads/2023/09/Adobe-Pro-Edition-Banner-1536x768.png" alt="Slide 3" className='rounded-3xl p-2' />
           </div>
 
@@ -41,6 +42,7 @@ const Home = () => {
 
         {/* <CategoryList /> */}
         <FeaturedProducts />
+        <ShowAllProudctss/>
       </div>
 
     </div>

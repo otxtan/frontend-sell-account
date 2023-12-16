@@ -24,9 +24,9 @@ const [customer,setCustomer]=useState(null);
   return (
     <div>
       <h2>User Information</h2>
-      <div className="bg-white p-4 rounded-md shadow-md">
+      <div className="bg-gray-900 p-4 rounded-md shadow-md">
         <div className="mb-4">
-          <label htmlFor="username" className="block text-sm font-medium text-gray-600">Username:</label>
+          <label htmlFor="username" className="block text-sm font-medium text-gray-100">Username:</label>
           <input
             type="text"
             id="username"
@@ -36,7 +36,7 @@ const [customer,setCustomer]=useState(null);
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="fullName" className="block text-sm font-medium text-gray-600">Full Name:</label>
+          <label htmlFor="fullName" className="block text-sm font-medium text-gray-100">Full Name:</label>
           <input
             type="text"
             id="full_name"
@@ -46,7 +46,7 @@ const [customer,setCustomer]=useState(null);
           />
         </div>
         <div>
-          <label htmlFor="phone_number" className="block text-sm font-medium text-gray-600">Email:</label>
+          <label htmlFor="phone_number" className="block text-sm font-medium text-gray-100">Email:</label>
           <input
             type="text"
             id="phone_number"
@@ -56,7 +56,7 @@ const [customer,setCustomer]=useState(null);
           />
         </div>
         <div>
-          <label htmlFor="email_address" className="block text-sm font-medium text-gray-600">Address:</label>
+          <label htmlFor="email_address" className="block text-sm font-medium text-gray-100">Address:</label>
           <input
             type="text"
             id="email_address"

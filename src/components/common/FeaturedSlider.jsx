@@ -46,13 +46,13 @@ const FeaturedSlider = () => {
   return (
     <Slider {...settings} className="p-2">
       <div className=''>
-        <img src="https://gamikey.com/wp-content/uploads/2023/08/Banner-Kapersky.png.webp" alt="Slide 1" className='rounded-3xl w-full' />
+        <img src="https://gamikey.com/wp-content/uploads/2023/11/Family-Spotify-1024x512.png" alt="Slide 1" className='rounded-3xl w-full' />
       </div>
       <div className='max-h-full'>
-        <img src="https://gamikey.com/wp-content/uploads/2023/08/Banner-Discord.png.webp" alt="Slide 2" className='rounded-3xl w-full' />
+        <img src="https://gamikey.com/wp-content/uploads/2023/04/Canva-1024x512.jpg.webp" alt="Slide 2" className='rounded-3xl w-full' />
       </div>
       <div>
-        <img src="https://gamikey.com/wp-content/uploads/2023/09/Adobe-Pro-Edition-Banner-1536x768.png" alt="Slide 3" className='rounded-3xl w-full' />
+        <img src="https://gamikey.com/wp-content/uploads/2023/11/Elsa-Premium-1024x512.png" alt="Slide 3" className='rounded-3xl w-full' />
       </div>
       {/* Thêm nhiều slide khác nếu cần */}
     </Slider>

@@ -28,7 +28,7 @@ const Cart = () => {
     const [InputVoucherCode, setInputVoucherCode] = useState();
     const [isMobile, setIsMobile] = useState(false);
     // const { user, login, logout } = useUser();
-const { user, login, logout, cartContext, setCartContext } = useUser();
+    const { user, login, logout, cartContext, setCartContext } = useUser();
     useEffect(() => {
         function handleResize() {
             setIsMobile(window.innerWidth <= 767);
@@ -45,9 +45,10 @@ const { user, login, logout, cartContext, setCartContext } = useUser();
     useEffect(() => {
         const fetchData = async () => {
             try {
-
+                console.log(cartContext)
                 const selectedItems = cartContext?.filter(item => item.selected);
-                const datavoucher = await voucherService.getvoucherbyproductcategory({ product: selectedItems });
+
+                const datavoucher = await voucherService.getvoucherbyproductcategory({ product: selectedItems.map(item => item.Subscription_plan) });
                 setVoucher(datavoucher);
                 console.log(user.UserId)
                 if (selectedItems.length >= 1 && selectedVoucher?.code) {
@@ -93,6 +94,7 @@ const { user, login, logout, cartContext, setCartContext } = useUser();
             if (selectedItems.length >= 1) {
                 setSelectedVoucher(voucher);
                 const data = await cartService.checkVoucher({ UserId: 1, Items: selectedItems, VoucherCode: voucher?.code });
+                console.log(data)
                 setCheckVoucher(data);
                 closeModal();
                 return;
@@ -139,7 +141,8 @@ const { user, login, logout, cartContext, setCartContext } = useUser();
     const [selectedAll, setSelectedAll] = useState(false);
     const toggleSelectAll = () => {
         if (!selectedAll) {
-            setCartContext(cartContext.map(item => (!item?.selected ? { ...item, selected: !item.selected } : item)));
+            console.log(cartContext)
+            setCartContext(cartContext.map(item => ((!item?.selected) && (item?.quantity <= item?.Subscription_plan?.total) ? { ...item, selected: !item.selected } : item)));
             setSelectedAll(true);
         }
         else {
@@ -156,6 +159,7 @@ const { user, login, logout, cartContext, setCartContext } = useUser();
                 return showMessage("Voucher không tồn tại");
             if (selectedItems.length >= 1) {
                 const data = await cartService.checkVoucher({ UserId: 1, Items: selectedItems, VoucherCode: InputVoucherCode });
+                console.log(data)
                 // setSelectedVoucher( await voucherService.findVoucher(selectedVoucher.code));
                 setCheckVoucher(data);
                 setSelectedVoucher(findVoucher);
@@ -171,7 +175,8 @@ const { user, login, logout, cartContext, setCartContext } = useUser();
         try {
             console.log(value + quantity <= (plan?.Subscription_plan.total - plan?.Subscription_plan.quantity_sold))
             if (value + quantity <= (plan?.Subscription_plan.total - plan?.Subscription_plan.quantity_sold) || quantity < 0) {
-                await cartService.updateCart(plan.id, (value + quantity));
+                if (quantity < plan?.Subscription_plan.total - plan?.Subscription_plan.quantity_sold)
+                    await cartService.updateCart(plan.id, (value + quantity));
                 const indexToDelete = cartContext?.findIndex(obj => obj.id === plan.id && (quantity + value) <= 0);
                 setCartContext(cartContext?.map(item => (item.id === plan.id ? { ...item, quantity: value + quantity } : item)));
                 if (indexToDelete !== -1) {
@@ -213,10 +218,12 @@ const { user, login, logout, cartContext, setCartContext } = useUser();
     const navigateToCheckout = () => {
 
         const selectedItems = cartContext?.filter(item => item.selected);
+        const cartId = selectedItems?.map(item => item.id);
+
         if (selectedItems.length < 1)
             return showMessage('Vui lòng chọn sản phẩm');
-        console.log(selectedVoucher)
-        navigate('/checkout', { state: { selectedItems: selectedItems, voucher: selectedVoucher } });
+        console.log(selectedItems)
+        navigate('/checkout', { state: { selectedItems: selectedItems, voucher: selectedVoucher, cartId } });
     };
 
     return (
@@ -258,9 +265,9 @@ const { user, login, logout, cartContext, setCartContext } = useUser();
                             : (item?.Subscription_plan?.total < item?.quantity) ? <p>Thay đổi giá trị lại</p> : null}
 
 
-                        <div className="flex w-3/6 ">
-                            <div className="w-1/3 ">
-                                <img
+                        <div className="flex w-3/6  ">
+                            <div className="w-1/3 mx-2 ">
+                                <img className='rounded-md'
                                     src={item?.Subscription_plan?.Product?.image}
                                     alt={item?.Subscription_plan?.Product?.image || '#'}
 
@@ -347,7 +354,8 @@ const { user, login, logout, cartContext, setCartContext } = useUser();
                                         onClick={() => handleSelectVoucher(item)}
                                     >
                                         <h3 className="text-lg font-semibold">{item?.code}-{item?.discount_percentage == 0 ? (`Giảm ${item.discount_amount}đ`) : (`Giảm ${item.discount_percentage}%`)}</h3>
-                                        <p className="text-gray-600 mb-2">{`Đơn Tối Thiểu ₫${VND.format(item.min_order_amount)}`}</p>
+                                        {/* <p className="text-gray-600 mb-2">{`Đơn Tối Thiểu ₫${VND.format(item.min_order_amount)}`}</p> */}
+                                        <p className="text-gray-600 mb-2">{`Đơn Tối Thiểu ${VND.format(item?.min_order_amount)} - giảm tối đa ${VND.format(item?.minimize)}`} </p>
                                         <p className="text-gray-600">{`HSD: ${new Date(item.end_date).toLocaleDateString()} - ${new Date(item.end_date).toLocaleTimeString()}`}</p>
                                     </div>
                                 ))}
@@ -377,7 +385,8 @@ const { user, login, logout, cartContext, setCartContext } = useUser();
                         // onClick={() => handleSelectVoucher(selectedVoucher)}
                         >
                             <h3 className="text-lg font-semibold">{selectedVoucher?.code} - {selectedVoucher?.discount_percentage == 0 ? (`Giảm ${selectedVoucher?.discount_amount}đ`) : (`Giảm ${selectedVoucher?.discount_percentage}%`)}</h3>
-                            <p className="text-gray-600 mb-2">{`Đơn Tối Thiểu ₫${VND.format(selectedVoucher?.min_order_amount)}`}</p>
+                            {/* <p className="text-gray-600 mb-2">{`Đơn Tối Thiểu ₫${VND.format(selectedVoucher?.min_order_amount)}`}</p> */}
+                            <p className="text-gray-600 mb-2">{`Đơn Tối Thiểu ${VND.format(selectedVoucher?.min_order_amount)} - giảm tối đa ${VND.format(selectedVoucher?.minimize)}`} </p>
                             <p className="text-gray-600">{`HSD: ${new Date(selectedVoucher?.end_date).toLocaleDateString()} - ${new Date(selectedVoucher?.end_date).toLocaleTimeString()}`}</p>
                             {
                                 selectedVoucher ? <button className=' p-2 bg-orange-500 shadow rounded-md text-white my-3' onClick={() => handleButtonCancel()}>Remove</button> : null
@@ -389,9 +398,10 @@ const { user, login, logout, cartContext, setCartContext } = useUser();
                 </div>
 
             </div>
-            <p className="text-lg font-semibold mt-4">total: {VND.format(getTotalPrice().toFixed(2) || checkVoucher?.total?.toFixed(2))}</p>
-            <p className="text-lg font-semibold mt-4">totalDiscount: {VND.format(checkVoucher?.totalDiscount?.toFixed(2) || 0)}</p>
-            <p className="text-lg font-semibold mt-4">totalPayment: {VND.format(checkVoucher?.totalPayment?.toFixed(2) || getTotalPrice().toFixed(2))}</p>
+            <p className="text-lg font-semibold mt-4">Total: {VND.format(getTotalPrice().toFixed(2) || checkVoucher?.total?.toFixed(2))}</p>
+            
+            <p className="text-lg font-semibold mt-4">Discount: {VND.format(checkVoucher?.totalDiscount?.toFixed(2) || 0)}</p>
+            <p className="text-lg font-semibold mt-4">Payment: {VND.format(checkVoucher?.totalPayment?.toFixed(2) || getTotalPrice().toFixed(2))}</p>
 
 
             {/* Nút Mua Hàng */}

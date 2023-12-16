@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from 'react';
+import transactionService from '../services/transactionService';
+import { useLocation } from 'react-router-dom';
 
 const PaymentResult = () => {
   const [isSuccess, setIsSuccess] = useState(false);
-
+  const location = useLocation();
+  
   useEffect(() => {
     // Xử lý kết quả thanh toán từ VNPAY
-    const queryParams = new URLSearchParams(window.location.search);
-    const responseCode = queryParams.get('vnp_ResponseCode');
-    setIsSuccess(responseCode === '00');
+    const fetchData = async () => {
+      await transactionService.confirmPayment(location.state.id,{transaction_status:true})
+      // const queryParams = new URLSearchParams(window.location.search);
+      
+      setIsSuccess(true);
+    }
+    fetchData();
   }, []);
 
   return (

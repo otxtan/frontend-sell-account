@@ -27,11 +27,22 @@ const transactionService = {
         }
 
     },
-    update: async (id, value) => {
+    update: async (id, data) => {
         try {
 
-            console.log(`${id}, ${value}`)
-            const response = await axios.put(`${url}/transaction/${id}`, { quantity: value });
+            console.log(`${id}, ${data}`)
+            const response = await axios.put(`${url}/transaction/${id}`, { quantity: data });
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            throw error;
+        }
+    },
+    confirmPayment: async (id, data) => {
+        try {
+
+            console.log( data)
+            const response = await axios.put(`${url}/transaction/confirmPayment/${id}`,data);
             return response.data;
         } catch (error) {
             console.error('Error fetching products:', error);
@@ -43,7 +54,7 @@ const transactionService = {
     getAllByPage: async (data) => {
         try {
             console.log(data)
-            const response = await axios.get(`${url}/transaction/findallbylbypage?page=${data.page}&size=${data.size}&categoryname=${data.categoryname}`);
+            const response = await axios.get(`${url}/transaction/getbypage?page=${data.page}&size=${data.size}&transaction_status=${data.transaction_status}`);
             console.log(response.data);
             return response.data;
         } catch (error) {

@@ -4,8 +4,8 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-800 text-white p-4">
-      <div className="container mx-auto">
+    <footer className="bg-gray-800 text-white p-4  mt-auto">
+      <div className=" ">
         {/* Nội dung của footer */}
         <div className="grid grid-cols-2 gap-4">
           <div>

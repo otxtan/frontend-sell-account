@@ -15,6 +15,7 @@ import SelectCustom from '../common/SelectCustom';
 import categoryService from '../../services/categoryService';
 import typeService from '../../services/TypeService';
 import ProductDetail from '../../pages/productDetail';
+import MyEditor from '../common/MyEditText';
 Modal.setAppElement('#root');
 const ProductManager = () => {
     const VND = new Intl.NumberFormat('vi-VN', {
@@ -175,6 +176,9 @@ const ProductManager = () => {
 
             fetchData();
         }, []);
+        const handleChangeDescription=(e)=>{
+            console.log(e)
+        }
         return (
             <form onSubmit={handleSubmitProduct} className='px-auto text-white w-3/4 mx-20'>
                 <div className="grid grid-cols-2 gap-4 my-2">
@@ -183,18 +187,30 @@ const ProductManager = () => {
                     </label>
                     <input className='bg-gray-500 rounded-md p-2' type="text" name="name" value={formDataProduct?.name} onChange={handleChangeFormProduct} />
                 </div>
-                <div className="grid grid-cols-2 gap-4 my-2">
+                <div className=" my-2">
                     <label>
                         description:
                     </label>
-                    <input className='bg-gray-500 rounded-md p-2' type="text" name="description" value={formDataProduct?.description} onChange={handleChangeFormProduct} />
+                    {/* <input className='bg-gray-500 rounded-md p-2' type="text" name="description" value={formDataProduct?.description} onChange={handleChangeFormProduct} /> */}
+                    <MyEditor name="description" value={formDataProduct?.description} onEditorChange={(e)=>{
+                        setFormDataProduct({
+                            ...formDataProduct,
+                            description: e,
+                        })
+                    }}/>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 my-2">
                     <label>
                         content:
                     </label>
-                    <textarea className='bg-gray-500 rounded-md p-2' type="text" name="content" value={formDataProduct?.content} onChange={handleChangeFormProduct} />
+                    {/* <textarea className='bg-gray-500 rounded-md p-2' type="text" name="content" value={formDataProduct?.content} onChange={handleChangeFormProduct} /> */}
+                    <MyEditor  name="content" value={formDataProduct?.content} onEditorChange={(e)=>{
+                        setFormDataProduct({
+                            ...formDataProduct,
+                            content: e,
+                        })
+                    }}/>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 my-2">
@@ -408,18 +424,30 @@ const ProductManager = () => {
                     </label>
                     <input className='bg-gray-500 rounded-md p-2' type="text" name="name" value={formDataProduct?.name} onChange={handleChangeFormProduct} />
                 </div>
-                <div className="grid grid-cols-2 gap-4 my-2">
+                <div className=" gap-4 my-2">
                     <label>
                         description:
                     </label>
-                    <input className='bg-gray-500 rounded-md p-2' type="text" name="description" value={formDataProduct?.description} onChange={handleChangeFormProduct} />
+                    <MyEditor name="description" value={formDataProduct?.description} onEditorChange={(e)=>{
+                        setFormDataProduct({
+                            ...formDataProduct,
+                            description: e,
+                        })
+                    }}/>
+                    {/* <input className='bg-gray-500 rounded-md p-2' type="text" name="description" value={formDataProduct?.description} onChange={handleChangeFormProduct} /> */}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 my-2">
+                <div className=" gap-4 my-2">
                     <label>
                         content:
                     </label>
-                    <textarea className='bg-gray-500 rounded-md p-2' type="text" name="content" value={formDataProduct?.content} onChange={handleChangeFormProduct} />
+                    {/* <textarea className='bg-gray-500 rounded-md p-2' type="text" name="content" value={formDataProduct?.content} onChange={handleChangeFormProduct} /> */}
+                    <MyEditor name="content" value={formDataProduct?.content} onEditorChange={(e)=>{
+                        setFormDataProduct({
+                            ...formDataProduct,
+                            content: e,
+                        })
+                    }}/>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 my-2">

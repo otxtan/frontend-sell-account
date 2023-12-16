@@ -29,7 +29,7 @@ const SelectCustom = (props) => {
     }
   };
 
-  return <CreatableSelect isClearable options={props.options} onCreateOption={handleCreateOption} styles={customStyles} onChange={handleChange} />;
+  return <CreatableSelect isClearable options={props.options} onCreateOption={handleCreateOption} value={props.value} defaultValue={props.defaultValue} styles={customStyles} onChange={handleChange} />;
 };
 
 export default SelectCustom;

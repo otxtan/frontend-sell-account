@@ -1,7 +1,7 @@
 // src/components/Header.js
 import React, { useEffect, useState } from 'react';
 import logo from '../../assets/images/logo.png';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '@fortawesome/fontawesome-free/css/all.css';
 import { useUser } from '../../context/userProvider';
 import '../../assets/styles/Header.css';
@@ -9,16 +9,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Header = () => {
-  const showMessage = (message) => {
-    toast.success(message, {
-      position: 'top-right',
-      autoClose: 3000, // Đóng tự động sau 3000 milliseconds (3 giây)
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-    });
-  }
+  const navigate = useNavigate();
+  const [InputSearch, setInputSeacrch] = useState("");
   const { user, login, logout, cartContext, setCartContext } = useUser();
   const [isListVisible, setListVisible] = useState(false);
 
@@ -29,9 +21,9 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-gray-800 p-4">
-      <ToastContainer />
-      <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
+    <header className=" bg-gray-800 p-4 ">
+      {/* <ToastContainer /> */}
+      <div className=" mx-auto flex flex-col md:flex-row justify-between items-center">
         {/* Logo hoặc Tên ứng dụng */}
         <div className="flex items-center mb-4 md:mb-0">
           <Link to="/" className="text-white text-2xl font-bold">
@@ -63,9 +55,18 @@ const Header = () => {
             type="text"
             placeholder="Search..."
             className="border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:border-blue-500 w-full md:w-64"
+            onChange={e => {
+              setInputSeacrch(e.target.value)
+            }}
+            onKeyPress={e => {
+              if (e.key === 'Enter') {
+                navigate('/search', { state: { InputSearch } });
+              };
+
+            }}
           />
-         
-         
+
+
         </div>
 
         {/* Giỏ hàng và Đăng nhập/Đăng ký */}
@@ -81,13 +82,27 @@ const Header = () => {
             Sign Up
           </Link>
         </div>) : (<div className="flex items-center space-x-4">
-          <Link to="/cart" className="text-white hover:text-gray-300">
+          {/* <Link to="/cart" className="text-white hover:text-gray-300">
             <div className='cart-icon-container'>
               <i className="fas fa-shopping-cart text-2xl"></i>
               <span className="cart-badge">{cartContext?.length}</span>
               {console.log(cartContext?.length)}
             </div>
-          </Link>
+          </Link> */}
+          {cartContext?.length > 0 ? (<Link to="/cart" className="text-white hover:text-gray-300">
+            <div className='cart-icon-container'>
+              <i className="fas fa-shopping-cart text-2xl"></i>
+              <span className="cart-badge">{cartContext?.length}</span>
+              {console.log(cartContext?.length)}
+            </div>
+          </Link>) : (<Link to="/cart" className="text-white hover:text-gray-300">
+            <div className='cart-icon-container'>
+              <i className="fas fa-shopping-cart text-2xl"></i>
+
+
+            </div>
+          </Link>)}
+
           <Link to="/dashboard" className="text-white hover:text-gray-300">
             {user.username}
           </Link>

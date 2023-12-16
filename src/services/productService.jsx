@@ -44,17 +44,41 @@ const productService = {
       throw error;
     }
   },
-  getAllProductsByPage: async (data) => {
+  getAllProductsByCategoryByPage: async (data) => {
     try {
       console.log(data)
-      const response = await axios.get(`${url}/product/findallbylbypage?page=${data.page}&size=${data.size}&categoryname=${data.categoryname}`);
-      console.log(response.data);
+      const response = await axios.get(`${url}/product/findallbyCategoryNamebypage?page=${data.page}&size=${data.size}&categoryname=${data.categoryname}`);
+     
       return response.data;
     } catch (error) {
       console.error('Error fetching products:', error);
       throw error;
     }
   },
+  getAllProductsDetailByPage: async (data) => {
+    try {
+      console.log(data)
+      const response = await axios.get(`${url}/product/findAllProductDetailByPage?page=${data.page}&size=${data.size}&name=${data.name}`);
+     
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      throw error;
+    }
+  },
+
+  findAllProductCheckOut: async (data) => {
+    try {
+      console.log(data)
+      const response = await axios.post(`${url}/product/getProductCheckOut`,data);
+
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      throw error;
+    }
+  },
+
   getAllProductsCategoryTypeByPage: async (data) => {
     try {
 
@@ -80,7 +104,7 @@ const productService = {
     }
 
   },
-  update: async (id,data) => {
+  update: async (id, data) => {
     try {
 
       console.log(data)

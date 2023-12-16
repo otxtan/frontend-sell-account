@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import productService from '../services/productService';
-import { Navigate, Outlet, useParams } from 'react-router-dom';
+import { Navigate, Outlet, useNavigate, useParams,Link } from 'react-router-dom';
 import Alert from '../components/common/Alert';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -17,13 +17,16 @@ const ProductDetail = (props) => {
   });
 
   const [product, setProduct] = useState({});
-
+  const [ProductSimilar,setProductSimilar]=useState([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
         console.log(id)
-        const data = await productService.getProductDetail(id||props.value.value.id);
-        console.log(data);
+        const data = await productService.getProductDetail(id || props.value.value.id);
+        console.log(data)
+        setProductSimilar(await productService.getAllProductsByCategoryByPage({ page: 1, size: 10, categoryname: data.product.Product_category.product_category_name }));
+        if (data.length <= 1)
+          setPlanChoose(data.subscriptionPlans[0].id)
         setProduct(data);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -31,7 +34,7 @@ const ProductDetail = (props) => {
     };
 
     fetchData();
-  }, []);
+  }, [id]);
   const [activeButton, setActiveButton] = useState(null);
   const [pricePlan, setPricePlan] = useState(null);
   const [priceOldPlan, setPriceOldPlan] = useState(null);
@@ -40,7 +43,11 @@ const ProductDetail = (props) => {
   const [quantity, setQuantity] = useState(1);
   const [alert, setAlert] = useState('');
   const handleButtonClickQuantity = async (value) => {
+    console.log(value)
+    console.log(planChoose)
+
     if (planChoose > 0) {
+      console.log(product)
       const foundProduct = product.subscriptionPlans.find(item => item.id === planChoose);
 
       if (foundProduct.total - foundProduct.quantity_sold < 0 || quantity + value > foundProduct.total - foundProduct.quantity_sold) {
@@ -62,6 +69,8 @@ const ProductDetail = (props) => {
     }
   }
   const handleButtonClick = (plan) => {
+    console.log(plan)
+    console.log(planChoose)
     // console.log('nội dung'+plan.price)
     if (planChoose === null) {
       setPlanChoose(plan.id);
@@ -85,20 +94,35 @@ const ProductDetail = (props) => {
     }
 
   };
+  const navigate = useNavigate();
+  const handleButtonClickBuyNow = () => {
+    if (user) {
+      if (planChoose != null) {
+        navigate('/checkout', { state: { selectedItems: [{ SubscriptionPlanId: planChoose, quantity }] }, voucher: "" })
+      }
+
+      else {
+        Alert.showMessage('Hãy chọn sản phẩm');
+      }
+    }
+    else {
+      Alert.showMessage('Vui lòng đăng nhập');
+    }
+  }
   const handleButtonClickAddToCart = async () => {
     try {
-       
+
       if (user) {
 
+        console.log(user)
         if (planChoose != null) {
-
           const data = await cartService.addToCart({
             UserId: user.UserId,
             SubscriptionPlanId: planChoose,
             quantity: quantity
           });
           if (data?.id) {
-           Alert.showMessage('Thêm vào giỏ hàng thành công');
+            Alert.showMessage('Thêm vào giỏ hàng thành công');
             const dataCart = await cartService.getCartByUser(user?.UserId || null);
             setCartContext(dataCart);
 
@@ -108,7 +132,7 @@ const ProductDetail = (props) => {
           if (product?.subscriptionPlans?.length == 1) {
             console.log()
             const data = await cartService.addToCart({
-              UserId: 1,
+              UserId: user.UserId,
               SubscriptionPlanId: (product?.subscriptionPlans[0]?.id),
               quantity: quantity
             });
@@ -121,7 +145,7 @@ const ProductDetail = (props) => {
             }
           }
         }
-      }else{
+      } else {
         Alert.showMessage('Vui lòng đăng nhập');
       }
 
@@ -157,10 +181,10 @@ const ProductDetail = (props) => {
   return (
     <div className="container mx-auto mt-10 p-6 bg-white rounded-md shadow-md">
 
-      <ToastContainer />
+
       <div className="flex">
         <div className="w-1/2">
-          <img src={product?.product?.image} alt={product?.product?.name} className="rounded-lg" />
+          <img src={product?.product?.image} alt={product?.product?.name} className="rounded-lg object-cover mx-auto" />
         </div>
         <div className="w-1/2 ml-6">
           <h2 className="text-2xl font-semibold mb-4">{product?.product?.name}</h2>
@@ -267,13 +291,14 @@ const ProductDetail = (props) => {
           </div>
 
           <div>
-            <button className='p-3 border-2 border-gray-600 mx-1 rounded-md my-2 w-3/4' >Buy Now</button>
+            <button className='p-3 border-2 border-gray-600 mx-1 rounded-md my-2 w-3/4' onClick={() => handleButtonClickBuyNow()} >Buy Now</button>
             <button className='p-3 border-2 border-gray-600 mx-1 rounded-md bg-orange-500 my-2 w-3/4' onClick={() => handleButtonClickAddToCart()}>Add to cart</button>
           </div>
           <div className='mb-6'></div>
           <div className="mb-6">
             <p className="font-semibold">Description:</p>
-            <p className="text-gray-700 mb-4">{product?.product?.description}</p>
+            {/* <p className="text-gray-700 mb-4">{product?.product?.description}</p> */}
+            <div dangerouslySetInnerHTML={{ __html: product?.product?.description }} />
           </div>
           <div className="mb-6">
             <p className="font-semibold">Content:</p>
@@ -299,6 +324,25 @@ const ProductDetail = (props) => {
           ))}
         </div>
       </div> */}
+      <h2 className='p-10 font-bold text-xl' >Sản phẩm tương tự</h2>
+      <div className="grid grid-cols-6 gap-4 ">
+        {ProductSimilar?.items?.map((item) => (
+          <Link to={`/product/${item?.product?.id}`}>
+
+            <div key={item?.product?.id} className="border p-4">
+              <img src={item?.product?.image} alt={item.product.name} className="mb-2 rounded-md" />
+              <p className="font-bold">{item?.product?.name}</p>
+              {item?.subscriptionPlans?.length > 1 ? (<span className='font-bold text-gray-900 '> {VND.format(item?.subscriptionPlans[0]?.price)}-{VND.format(item?.subscriptionPlans[item?.subscriptionPlans.length - 1].price)}</span>) : (<p>Giá: {VND.format(item.subscriptionPlans[0]?.price)}</p>)}
+
+              {item?.subscriptionPlans?.discount && (
+                <p>Giảm giá: {item?.subscriptionPlans?.discount}%</p>
+              )}
+              <p>Đã bán: {item?.totalSold}</p>
+              <p>sao: {item?.rating}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 };
